@@ -58,7 +58,8 @@ export function JobFilters({ categories, filters, onChange }: JobFiltersProps) {
 
       <div>
         <Label className="mb-2">Kategorije</Label>
-        <div className="flex flex-wrap gap-2">
+        <div className="max-h-56 overflow-y-auto rounded-lg border border-slate-100 p-2">
+          <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -73,6 +74,7 @@ export function JobFilters({ categories, filters, onChange }: JobFiltersProps) {
               {cat.name}
             </button>
           ))}
+          </div>
         </div>
       </div>
 

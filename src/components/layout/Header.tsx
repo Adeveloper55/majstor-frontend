@@ -19,17 +19,22 @@ export function Header() {
 
   return (
     <header className="border-b bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href={role === "ROLE_ADMIN" ? "/admin" : "/dashboard"} className="text-lg font-bold text-primary-800">
-          Majstor na klik
-        </Link>
-        <div className="flex items-center gap-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-4">
+          <Link href="/" className="shrink-0 text-lg font-bold text-primary-800" title="Početna strana">
+            Majstor na klik
+          </Link>
+          <Link href="/" className="hidden text-sm font-medium text-slate-600 hover:text-primary-800 sm:inline">
+            Početna
+          </Link>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
           {tokenBalance !== null && tokenBalance !== undefined && (
             <span className="rounded-full bg-primary-100 px-3 py-1.5 text-sm font-semibold text-primary-900">
               {tokenBalance} tokena
             </span>
           )}
-          {user && <span className="text-base font-medium text-slate-700">{user.fullName || user.email}</span>}
+          {user && <span className="hidden text-base font-medium text-slate-700 sm:inline">{user.fullName || user.email}</span>}
           <Button variant="outline" size="sm" onClick={() => { logout(); router.push("/login"); }}>
             Odjava
           </Button>

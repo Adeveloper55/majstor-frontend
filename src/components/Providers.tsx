@@ -11,6 +11,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     hydrate();
+    if (process.env.NODE_ENV === "development" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((reg) => reg.unregister());
+      });
+    }
   }, [hydrate]);
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;

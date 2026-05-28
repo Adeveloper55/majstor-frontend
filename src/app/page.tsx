@@ -12,14 +12,15 @@ import {
   Users,
   ArrowRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const categories = [
-  { icon: Zap, name: "Elektrika", color: "bg-amber-100 text-amber-700" },
-  { icon: Droplets, name: "Vodoinstalacije", color: "bg-blue-100 text-blue-700" },
-  { icon: Hammer, name: "Stolarija", color: "bg-orange-100 text-orange-700" },
-  { icon: Paintbrush, name: "Molerski radovi", color: "bg-purple-100 text-purple-700" },
+const popularCategories = [
+  { icon: Zap, name: "Elektroinstalacije", slug: "elektroinstalacije-elektricar", color: "bg-amber-100 text-amber-700" },
+  { icon: Droplets, name: "Vodoinstalater", slug: "vodoinstalater", color: "bg-blue-100 text-blue-700" },
+  { icon: Hammer, name: "Stolar", slug: "stolar", color: "bg-orange-100 text-orange-700" },
+  { icon: Paintbrush, name: "Krečenje, moler", slug: "krecenje-moler", color: "bg-purple-100 text-purple-700" },
 ];
 
 const steps = [
@@ -32,8 +33,8 @@ const steps = [
     desc: "Verifikovani majstori troše tokene da pošalju ponudu.",
   },
   {
-    title: "Izaberite majstora",
-    desc: "Uporedite prijave, ocene i poruke — izaberite najboljeg.",
+    title: "Admin dodeli majstora",
+    desc: "Admin pregleda prijave i dodeljuje najboljeg majstora za posao.",
   },
 ];
 
@@ -48,7 +49,7 @@ export default function HomePage() {
     <main>
       {/* Hero */}
       <section className="hero-section">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggIGQ9Ik0zNiAzNGg2djZIMzZ6TTAgMGg2djZIMHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
+        <div className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggIGQ9Ik0zNiAzNGg2djZIMzZ6TTAgMGg2djZIMHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
         <div className="page-container relative py-16 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
             <div className="hero-badge">
@@ -60,41 +61,43 @@ export default function HomePage() {
             </h1>
             <p className="hero-subtitle mb-10">
               Objavite posao besplatno. Majstori se prijave za par klikova.
-              Vi birate najboljeg — bez stresa.
+              Admin dodeljuje majstora — bez stresa.
             </p>
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/register/client">
-                <Button size="lg" className="btn-hero-primary">
-                  Tražim majstora
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+              <Link href="/register/client" className={cn(buttonVariants({ size: "lg" }), "btn-hero-primary w-full min-w-[200px] sm:w-auto")}>
+                Tražim majstora
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-              <Link href="/register/handyman">
-                <Button size="lg" variant="outline" className="btn-hero-secondary">
-                  Ja sam majstor
-                </Button>
+              <Link href="/register/handyman" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "btn-hero-secondary w-full min-w-[200px] sm:w-auto")}>
+                Ja sam majstor
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Kategorije */}
-      <section className="page-container py-16">
+      {/* Popularne kategorije — originalni lep izgled */}
+      <section id="najtrazenije" className="page-container py-16">
         <h2 className="section-title mb-2 text-center">Popularne kategorije</h2>
         <p className="mb-10 text-center text-base text-slate-600">Od elektrike do molerskih radova</p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {categories.map(({ icon: Icon, name, color }) => (
-            <Card key={name} className="cursor-default transition-shadow hover:shadow-elevated">
-              <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${color}`}>
-                  <Icon className="h-7 w-7" />
-                </div>
-                <p className="text-base font-semibold text-slate-800">{name}</p>
-              </CardContent>
-            </Card>
+          {popularCategories.map(({ icon: Icon, name, slug, color }) => (
+            <Link key={slug} href={`/register/client?category=${slug}`}>
+              <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-elevated">
+                <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${color}`}>
+                    <Icon className="h-7 w-7" />
+                  </div>
+                  <p className="text-base font-semibold text-slate-800">{name}</p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
+        <p className="mt-8 text-center text-sm text-slate-500">
+          Još 40+ usluga — pogledajte u meniju{" "}
+          <span className="font-semibold text-primary-800">Najtraženije</span> u headeru
+        </p>
       </section>
 
       {/* Kako radi */}
@@ -132,12 +135,19 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="page-container pb-20">
-        <div className="rounded-2xl bg-primary-800 px-6 py-12 text-center sm:px-12" style={{ background: "linear-gradient(135deg, #1e40af, #1d4ed8)" }}>
+        <div
+          className="rounded-2xl bg-primary-800 px-6 py-12 text-center sm:px-12"
+          style={{ background: "linear-gradient(135deg, #1e40af, #1d4ed8)" }}
+        >
           <h2 className="mb-4 text-2xl font-bold text-white sm:text-3xl">Spremni da krenete?</h2>
           <p className="mb-8 text-base text-blue-100">Registracija traje manje od 2 minuta.</p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/register/client"><Button size="lg" className="btn-hero-primary">Registruj se kao klijent</Button></Link>
-            <Link href="/login"><Button size="lg" variant="outline" className="btn-hero-secondary">Već imam nalog</Button></Link>
+            <Link href="/register/client" className={cn(buttonVariants({ size: "lg" }), "btn-hero-primary")}>
+              Registruj se kao klijent
+            </Link>
+            <Link href="/login" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "btn-hero-secondary")}>
+              Već imam nalog
+            </Link>
           </div>
         </div>
       </section>

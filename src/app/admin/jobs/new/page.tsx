@@ -105,7 +105,8 @@ export default function AdminCreateJobPage() {
 
               <div>
                 <Label>Kategorija *</Label>
-                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="mt-2 max-h-80 overflow-y-auto rounded-lg border border-slate-100 p-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {categories?.map((cat: { id: number; name: string; slug: string; baseTokenCost: number }) => (
                     <button
                       key={cat.id}
@@ -117,6 +118,7 @@ export default function AdminCreateJobPage() {
                       <p className="mt-1 font-semibold">{cat.name}</p>
                     </button>
                   ))}
+                  </div>
                 </div>
               </div>
 

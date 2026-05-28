@@ -87,7 +87,8 @@ export function JobForm() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {step === 1 && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="max-h-96 overflow-y-auto rounded-lg border border-slate-100 p-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {categories?.map((cat: { id: number; name: string; slug: string; baseTokenCost: number }) => (
                 <button
                   key={cat.id}
@@ -101,6 +102,7 @@ export function JobForm() {
                 </button>
               ))}
               {errors.categoryId && <p className="col-span-2 text-sm text-red-600">{errors.categoryId.message}</p>}
+              </div>
             </div>
           )}
 

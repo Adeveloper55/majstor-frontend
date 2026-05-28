@@ -74,7 +74,8 @@ export default function EditJobPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label>Kategorija</Label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
+                <div className="mt-2 max-h-80 overflow-y-auto rounded-lg border border-slate-100 p-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {categories?.map((cat: { id: number; name: string; slug: string }) => (
                     <button
                       key={cat.id}
@@ -85,6 +86,7 @@ export default function EditJobPage() {
                       {CATEGORY_ICONS[cat.slug] || "🔨"} {cat.name}
                     </button>
                   ))}
+                  </div>
                 </div>
               </div>
               <div><Label>Naslov</Label><Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>

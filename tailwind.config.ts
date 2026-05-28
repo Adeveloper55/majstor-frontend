@@ -23,6 +23,13 @@ const config: Config = {
           900: "#1e3a8a",
           950: "#172554",
         },
+        brand: {
+          DEFAULT: "#ea580c",
+          50: "#fff7ed",
+          100: "#ffedd5",
+          600: "#ea580c",
+          700: "#c2410c",
+        },
       },
       fontFamily: {
         sans: [

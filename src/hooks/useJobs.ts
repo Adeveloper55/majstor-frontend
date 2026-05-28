@@ -70,6 +70,6 @@ export function useAssignedJobs() {
 export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
-    queryFn: async () => unwrapPage<Category>((await api.get("/api/categories?size=50")).data),
+    queryFn: async () => unwrapPage<Category>((await api.get("/api/categories?size=100")).data),
   });
 }

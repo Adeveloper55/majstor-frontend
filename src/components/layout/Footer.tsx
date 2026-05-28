@@ -10,6 +10,9 @@ export function Footer() {
           <span className="font-semibold">Majstor na klik</span>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+          <Link href="/" className="hover:text-primary-800">
+            Početna strana
+          </Link>
           <Link href="/contact" className="hover:text-primary-800">
             Kontakt
           </Link>

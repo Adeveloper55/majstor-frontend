@@ -64,18 +64,54 @@ export const TOKEN_REQUEST_STATUS_LABELS = TOKEN_REQUEST_STATUS;
 
 export const CATEGORY_ICONS: Record<string, string> = {
   elektrika: "⚡",
+  "elektroinstalacije-elektricar": "⚡",
   vodoinstalacije: "💧",
+  vodoinstalater: "💧",
   "kucno-odrzavanje": "🏠",
   "molerski-radovi": "🎨",
+  "krecenje-moler": "🎨",
   stolarija: "🪚",
+  stolar: "🪚",
   keramika: "🧱",
+  "keramika-keramicar": "🧱",
+  "lepljenje-plocica": "🧱",
   "grejanje-klima": "🌡️",
+  "klima-uredjaji-ugradnja-klime": "🌡️",
+  "toplotne-pumpe": "🌡️",
   "bravarski-radovi": "🔧",
+  "bravarija-bravarske-usluge": "🔧",
   "gradjevinski-radovi": "🏗️",
+  "gradjevinski-radovi-nove": "🏗️",
   ciscenje: "🧹",
+  "agencija-za-ciscenje": "🧹",
+  "ciscenje-dimnjaka": "🧹",
+  selidbe: "📦",
+  fasade: "🏢",
+  "majstori-za-krov": "🏠",
+  parketari: "🪵",
+  laminati: "🪵",
+  drugo: "🔨",
 };
 
 export const BEST_VALUE_PACKAGE_NAMES = ["Standard", "Pro"];
+
+import { SERVICE_CATEGORIES } from "./categories";
+
+export {
+  SERVICE_CATEGORIES,
+  categoryRoutes,
+  getCategoryBySlug,
+  getCategoryPriceLabel,
+} from "./categories";
+export type { ServiceCategory } from "./categories";
+
+/** @deprecated Koristite SERVICE_CATEGORIES */
+export const NAJTRAZENIJE_SLUGS = SERVICE_CATEGORIES.map((c) => c.slug) as readonly string[];
+
+/** @deprecated Koristite SERVICE_CATEGORIES */
+export const NAJTRAZENIJE_LABELS = Object.fromEntries(
+  SERVICE_CATEGORIES.map((c) => [c.slug, c.name])
+) as Record<string, string>;
 
 export const DEFAULT_MAP_CENTER: [number, number] = [44.8176, 20.4633];
 export const DEFAULT_RADIUS_KM = 25;

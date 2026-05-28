@@ -19,8 +19,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (typeof window !== "undefined" && error.response?.status === 401) {
-      clearAuth();
-      window.location.href = "/login";
+      const hadAuth = Boolean(error.config?.headers?.Authorization);
+      if (hadAuth) {
+        clearAuth();
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }
