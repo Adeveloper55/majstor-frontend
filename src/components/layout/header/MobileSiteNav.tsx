@@ -153,7 +153,7 @@ export function MobileSiteNav({
 
       <div className="space-y-2 p-4">
         <Link
-          href="/register/handyman"
+          href="/registracija-preduzeca"
           className={cn(buttonVariants(), "w-full bg-brand-600 hover:bg-brand-700")}
           onClick={onNavigate}
         >

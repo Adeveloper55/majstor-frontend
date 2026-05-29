@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button-variants";
 
 export default function MagazinPage() {
   return (
@@ -9,7 +10,10 @@ export default function MagazinPage() {
         <p className="mt-4 text-lg text-slate-600">
           Saveti, vodiči i vesti o renoviranju, gradnji i održavanju doma.
         </p>
-        <Link href="/" className={buttonVariants({ variant: "outline", size: "lg", className: "mt-8 inline-flex" })}>
+        <Link
+          href="/"
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }), "mt-8 inline-flex")}
+        >
           Nazad na početnu
         </Link>
       </div>

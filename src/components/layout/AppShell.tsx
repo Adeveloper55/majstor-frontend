@@ -12,7 +12,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/majstori/") ||
     pathname.startsWith("/izvodjaci/") ||
     pathname.startsWith("/prosecne-cene/") ||
-    pathname === "/magazin";
+    pathname === "/magazin" ||
+    pathname === "/pretraga" ||
+    pathname.startsWith("/pretraga/") ||
+    pathname === "/registracija-preduzeca";
 
   return (
     <div className="flex min-h-screen flex-col">

@@ -85,7 +85,7 @@ export function SiteHeaderNav({
               Daibau magazin
             </Link>
             <Link
-              href="/register/handyman"
+              href="/registracija-preduzeca"
               className={cn(
                 buttonVariants({ size: "sm" }),
                 "ml-1 whitespace-nowrap bg-brand-600 text-white hover:bg-brand-700"

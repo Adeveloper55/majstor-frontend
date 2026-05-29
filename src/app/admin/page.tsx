@@ -18,6 +18,7 @@ export default function AdminDashboardPage() {
     { label: "Otvoreni", key: "openJobs", color: "bg-green-500" },
     { label: "Zahtevi (tokeni)", key: "pendingTokenRequests", color: "bg-amber-500" },
     { label: "Zahtevi (poslovi)", key: "pendingJobApplications", color: "bg-orange-500" },
+    { label: "Registracije preduzeća", key: "pendingCompanyRegistrations", color: "bg-teal-500" },
     { label: "Prihod (EUR)", key: "totalRevenue", color: "bg-emerald-500" },
   ];
 

@@ -75,7 +75,7 @@ export default function AdminContactDetailPage() {
               {msg.isContractor && (
                 <Badge className="bg-amber-100 text-amber-800">Majstor / izvođač</Badge>
               )}
-              <Badge variant={msg.status === "NEW" ? "default" : "outline"}>
+              <Badge className={msg.status === "NEW" ? undefined : "border border-slate-200 bg-white text-slate-600"}>
                 {msg.status === "NEW" ? "Novo" : "Pročitano"}
               </Badge>
             </div>

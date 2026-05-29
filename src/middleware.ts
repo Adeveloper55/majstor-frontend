@@ -14,6 +14,8 @@ const publicPaths = [
   "/majstori",
   "/izvodjaci",
   "/prosecne-cene",
+  "/pretraga",
+  "/registracija-preduzeca",
 ];
 
 export function middleware(request: NextRequest) {
@@ -69,5 +71,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next|favicon.ico|manifest.json|sw.js|offline|.*\\..*).*)"],
 };
