@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useJobs, type JobFiltersState } from "@/hooks/useJobs";
@@ -10,6 +10,7 @@ import { JobFilters } from "@/components/jobs/JobFilters";
 import { JobList } from "@/components/jobs/JobList";
 import { JobsMap } from "@/components/maps/JobsMap";
 import { Button } from "@/components/ui/button";
+import type { Handyman } from "@/types";
 
 const defaultFilters: JobFiltersState = {
   categories: [],
@@ -21,8 +22,9 @@ const defaultFilters: JobFiltersState = {
 };
 
 export default function JobsPage() {
-  const { role } = useAuth();
+  const { role, user } = useAuth();
   const isHandyman = role === "ROLE_HANDYMAN";
+  const handymanCategoryIds = (user as Handyman | null)?.categoryIds ?? [];
   const [filters, setFilters] = useState<JobFiltersState>(defaultFilters);
 
   useEffect(() => {
@@ -33,14 +35,20 @@ export default function JobsPage() {
     }
   }, [isHandyman]);
   const { data: categories } = useCategories();
+  const visibleCategories = useMemo(() => {
+    if (!isHandyman || !categories) return categories;
+    if (!handymanCategoryIds.length) return [];
+    return categories.filter((c) => handymanCategoryIds.includes(c.id));
+  }, [isHandyman, categories, handymanCategoryIds]);
   const { data: jobs, isLoading } = useJobs(isHandyman ? filters : undefined, isHandyman ? "browse" : "my");
+  const needsCategories = isHandyman && handymanCategoryIds.length === 0;
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
       <Sidebar />
       <main className="flex flex-1 flex-col gap-6 p-6 lg:flex-row">
-        {isHandyman && categories && (
-          <JobFilters categories={categories} filters={filters} onChange={setFilters} />
+        {isHandyman && visibleCategories && visibleCategories.length > 0 && (
+          <JobFilters categories={visibleCategories} filters={filters} onChange={setFilters} />
         )}
         <div className="flex-1">
           <div className="mb-6 flex items-center justify-between">
@@ -49,7 +57,18 @@ export default function JobsPage() {
               <Link href="/jobs/new"><Button>Novi oglas</Button></Link>
             )}
           </div>
-          {isLoading ? <p>Učitavanje...</p> : (
+          {needsCategories ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+              <p className="font-medium">Niste izabrali kategorije poslova.</p>
+              <p className="mt-1 text-sm">
+                Na{" "}
+                <Link href="/profile" className="font-medium underline">
+                  profilu
+                </Link>{" "}
+                izaberite 1–10 kategorija da biste videli relevantne poslove.
+              </p>
+            </div>
+          ) : isLoading ? <p>Učitavanje...</p> : (
             <>
               {isHandyman && (jobs?.length ?? 0) > 0 && (
                 <div className="mb-6">

@@ -26,12 +26,13 @@ export default function AdminHandymenPage() {
         <Input placeholder="Pretraži po imenu ili emailu..." value={search} onChange={(e) => setSearch(e.target.value)} className="mb-4 max-w-md" />
         <div className="overflow-x-auto rounded-xl border-2 border-slate-200 bg-white">
           <table className="w-full text-base">
-            <thead className="bg-slate-50"><tr><th className="p-3 text-left">Ime</th><th className="p-3 text-left">Email</th><th className="p-3 text-left">Tokeni</th><th className="p-3"></th></tr></thead>
+            <thead className="bg-slate-50"><tr><th className="p-3 text-left">Ime</th><th className="p-3 text-left">Email</th><th className="p-3 text-left">PIB</th><th className="p-3 text-left">Tokeni</th><th className="p-3"></th></tr></thead>
             <tbody>
               {data?.map((h) => (
                 <tr key={h.id} className="border-t">
                   <td className="p-3">{h.fullName}</td>
                   <td className="p-3">{h.email}</td>
+                  <td className="p-3">{h.pib || "—"}</td>
                   <td className="p-3">{h.tokenBalance}</td>
                   <td className="p-3"><Link href={`/admin/handymen/${h.id}`} className="text-primary-800 hover:underline">Detalji</Link></td>
                 </tr>

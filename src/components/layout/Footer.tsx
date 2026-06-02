@@ -16,8 +16,11 @@ export function Footer() {
           <Link href="/contact" className="hover:text-primary-800">
             Kontakt
           </Link>
-          <Link href="/register/client" className="hover:text-primary-800">
-            Registracija klijenta
+          <Link href="/magazin" className="hover:text-primary-800">
+            Magazin
+          </Link>
+          <Link href="/register" className="hover:text-primary-800">
+            Registracija
           </Link>
           <Link href="/register/handyman" className="hover:text-primary-800">
             Registracija majstora

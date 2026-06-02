@@ -41,6 +41,10 @@ export default function AdminHandymanDetailPage() {
         <div className="mb-6 space-y-2 text-base">
           <p><strong>Email:</strong> {data?.email}</p>
           <p><strong>Grad:</strong> {data?.city || "—"}</p>
+          {data?.companyName && <p><strong>Preduzeće:</strong> {data.companyName}</p>}
+          <p><strong>PIB:</strong> {data?.pib || "—"}</p>
+          {data?.address && <p><strong>Adresa:</strong> {data.address}{data.postalCode ? `, ${data.postalCode}` : ""} {data.city || ""}</p>}
+          {data?.contactPerson && <p><strong>Kontakt osoba:</strong> {data.contactPerson}</p>}
           <p><strong>Tokeni:</strong> {data?.tokenBalance}</p>
           <p><strong>Ocena:</strong> {data?.averageRating} ({data?.totalReviews} recenzija)</p>
         </div>

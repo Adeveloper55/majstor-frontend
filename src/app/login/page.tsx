@@ -70,7 +70,13 @@ export default function LoginPage() {
             <Link href="/forgot-password" className="text-blue-800 hover:underline">Zaboravljena lozinka?</Link>
             <p>
               Nemaš nalog?{" "}
-              <Link href="/register/client" className="text-blue-800 hover:underline">Registruj se</Link>
+              <Link href="/register" className="text-blue-800 hover:underline">Registruj se</Link>
+            </p>
+            <p>
+              Majstor / izvođač?{" "}
+              <Link href="/register/handyman" className="text-blue-800 hover:underline">Registracija majstora (PIB obavezan)</Link>
+              {" · "}
+              <Link href="/registracija-preduzeca" className="text-blue-800 hover:underline">Registracija preduzeća</Link>
             </p>
           </div>
         </CardContent>

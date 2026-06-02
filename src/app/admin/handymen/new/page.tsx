@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { validatePib, normalizePib } from "@/lib/pibValidation";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +23,10 @@ export default function AdminCreateHandymanPage() {
     phone: "",
     city: "",
     bio: "",
+    pib: "",
     initialTokens: "10",
   });
+  const [pibError, setPibError] = useState("");
   const [error, setError] = useState("");
 
   const mutation = useMutation({
@@ -35,6 +38,7 @@ export default function AdminCreateHandymanPage() {
         phone: form.phone || undefined,
         city: form.city || undefined,
         bio: form.bio || undefined,
+        pib: normalizePib(form.pib) || undefined,
         initialTokens: form.initialTokens ? parseInt(form.initialTokens, 10) : 0,
       };
       const { data } = await api.post("/api/admin/handymen", payload);
@@ -53,6 +57,12 @@ export default function AdminCreateHandymanPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    const pibValidation = validatePib(form.pib, false);
+    if (pibValidation) {
+      setPibError(pibValidation);
+      return;
+    }
+    setPibError("");
     mutation.mutate();
   };
 
@@ -73,6 +83,19 @@ export default function AdminCreateHandymanPage() {
               <div><Label>Lozinka *</Label><Input type="password" required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
               <div><Label>Telefon</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
               <div><Label>Grad</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
+              <div>
+                <Label>PIB</Label>
+                <Input
+                  inputMode="numeric"
+                  placeholder="9 cifara"
+                  value={form.pib}
+                  onChange={(e) => {
+                    setForm({ ...form, pib: e.target.value.replace(/\D/g, "").slice(0, 9) });
+                    if (pibError) setPibError("");
+                  }}
+                />
+                {pibError && <p className="mt-1 text-sm text-red-600">{pibError}</p>}
+              </div>
               <div><Label>O majstoru</Label><Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} /></div>
               <div>
                 <Label>Početni tokeni</Label>

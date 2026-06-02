@@ -59,6 +59,13 @@ export default function RegisterClientPage() {
           <p className="mt-4 text-center text-sm">
             Već imaš nalog? <Link href="/login" className="text-blue-800 hover:underline">Prijavi se</Link>
           </p>
+          <p className="mt-2 text-center text-sm text-slate-600">
+            Majstor ili izvođač?{" "}
+            <Link href="/register/handyman" className="text-blue-800 hover:underline">Registracija majstora</Link>
+            {" · "}
+            <Link href="/registracija-preduzeca" className="text-blue-800 hover:underline">Registracija preduzeća</Link>
+            <span className="mt-1 block text-xs text-slate-500">Za majstore i preduzeća PIB je obavezan.</span>
+          </p>
         </CardContent>
       </Card>
     </main>

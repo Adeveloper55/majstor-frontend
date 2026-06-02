@@ -144,11 +144,11 @@ export function MobileSiteNav({
       </Accordion>
 
       <Link
-        href="/magazin"
+        href="/contact"
         className="block border-b border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800"
         onClick={onNavigate}
       >
-        Daibau magazin
+        Kontakt
       </Link>
 
       <div className="space-y-2 p-4">
@@ -176,7 +176,7 @@ export function MobileSiteNav({
             <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "w-full")} onClick={onNavigate}>
               Prijavi se
             </Link>
-            <Link href="/register/client" className={cn(buttonVariants(), "w-full")} onClick={onNavigate}>
+            <Link href="/register" className={cn(buttonVariants(), "w-full")} onClick={onNavigate}>
               Registruj se
             </Link>
             <Link href="/contact" className={cn(buttonVariants({ variant: "ghost" }), "w-full")} onClick={onNavigate}>

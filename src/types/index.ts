@@ -26,6 +26,14 @@ export interface Handyman {
   tokenBalance: number;
   averageRating: number;
   totalReviews: number;
+  companyName?: string;
+  pib?: string;
+  address?: string;
+  postalCode?: string;
+  country?: string;
+  contactPerson?: string;
+  isCompany?: boolean;
+  categoryIds?: number[];
   createdAt: string;
 }
 

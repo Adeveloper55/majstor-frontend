@@ -61,7 +61,7 @@ export function SiteHeaderNav({
             <span className="hidden sm:inline">Majstor na klik</span>
           </Link>
 
-          {/* 1–4: Nađi majstore, Alati, Daibau magazin, Da li ste izvođač? */}
+          {/* Nađi majstore, Alati, Da li ste izvođač? */}
           <nav
             className="hidden min-w-0 flex-1 items-center gap-1 md:flex"
             aria-label="Glavna navigacija"
@@ -79,12 +79,6 @@ export function SiteHeaderNav({
               onClose={closeMenus}
             />
             <Link
-              href="/magazin"
-              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 no-underline transition-colors hover:text-brand-600"
-            >
-              Daibau magazin
-            </Link>
-            <Link
               href="/registracija-preduzeca"
               className={cn(
                 buttonVariants({ size: "sm" }),
@@ -101,7 +95,7 @@ export function SiteHeaderNav({
               <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
                 Prijavi se
               </Link>
-              <Link href="/register/client" className={buttonVariants({ size: "sm" })}>
+              <Link href="/register" className={buttonVariants({ size: "sm" })}>
                 Registruj se
               </Link>
             </div>
