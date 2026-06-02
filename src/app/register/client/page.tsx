@@ -64,7 +64,7 @@ export default function RegisterClientPage() {
             <Link href="/register/handyman" className="text-blue-800 hover:underline">Registracija majstora</Link>
             {" · "}
             <Link href="/registracija-preduzeca" className="text-blue-800 hover:underline">Registracija preduzeća</Link>
-            <span className="mt-1 block text-xs text-slate-500">Za majstore i preduzeća PIB je obavezan.</span>
+            <span className="mt-1 block text-xs text-slate-500">Za preduzeća PIB je obavezan.</span>
           </p>
         </CardContent>
       </Card>

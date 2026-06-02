@@ -74,7 +74,7 @@ export default function LoginPage() {
             </p>
             <p>
               Majstor / izvođač?{" "}
-              <Link href="/register/handyman" className="text-blue-800 hover:underline">Registracija majstora (PIB obavezan)</Link>
+              <Link href="/register/handyman" className="text-blue-800 hover:underline">Registracija majstora</Link>
               {" · "}
               <Link href="/registracija-preduzeca" className="text-blue-800 hover:underline">Registracija preduzeća</Link>
             </p>

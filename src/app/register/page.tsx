@@ -17,7 +17,7 @@ const options = [
     href: "/register/handyman",
     icon: Wrench,
     title: "Majstor",
-    description: "Ponudite usluge kao registrovani izvođač. PIB je obavezan (9 cifara).",
+    description: "Ponudite usluge kao registrovani izvođač. Izaberite kategorije poslova.",
     cta: "Registracija majstora",
     highlight: true,
   },
@@ -37,7 +37,7 @@ export default function RegisterPage() {
       <div className="page-container mx-auto max-w-4xl">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Registruj se</h1>
-          <p className="mt-2 text-slate-600">Izaberi tip naloga. Za majstore i preduzeća unosi se PIB.</p>
+          <p className="mt-2 text-slate-600">Izaberi tip naloga. PIB je obavezan samo za preduzeća.</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">

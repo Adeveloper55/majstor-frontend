@@ -32,7 +32,7 @@ export default function RegisterHandymanPage() {
     setPibError("");
     setCategoryError("");
 
-    const pibValidation = validatePib(form.pib, true);
+    const pibValidation = validatePib(form.pib, false);
     if (pibValidation) {
       setPibError(pibValidation);
       setLoading(false);
@@ -52,7 +52,7 @@ export default function RegisterHandymanPage() {
     try {
       const payload = {
         ...form,
-        pib: normalizePib(form.pib),
+        pib: normalizePib(form.pib) || undefined,
         categoryIds,
       };
       const { data } = await api.post("/api/auth/register/handyman", payload);
@@ -78,10 +78,9 @@ export default function RegisterHandymanPage() {
             <div><Label>Telefon</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
             <div><Label>Grad</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
             <div>
-              <Label htmlFor="pib">PIB — Poreski identifikacioni broj *</Label>
+              <Label htmlFor="pib">PIB — Poreski identifikacioni broj (opciono)</Label>
               <Input
                 id="pib"
-                required
                 inputMode="numeric"
                 placeholder="9 cifara (npr. 123456789)"
                 value={form.pib}

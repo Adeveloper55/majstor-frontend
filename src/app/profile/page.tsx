@@ -52,7 +52,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (role === "ROLE_HANDYMAN") {
-      const pibValidation = validatePib(form.pib, true);
+      const pibValidation = validatePib(form.pib, false);
       if (pibValidation) {
         setPibError(pibValidation);
         return;
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             city: form.city,
             bio: form.bio,
             profileImageUrl: form.profileImageUrl,
-            pib: normalizePib(form.pib),
+            pib: normalizePib(form.pib) || undefined,
             categoryIds,
           }
         : form;
@@ -107,10 +107,9 @@ export default function ProfilePage() {
             {role === "ROLE_HANDYMAN" && (
               <>
                 <div>
-                  <Label htmlFor="profile-pib">PIB — Poreski identifikacioni broj *</Label>
+                  <Label htmlFor="profile-pib">PIB — Poreski identifikacioni broj (opciono)</Label>
                   <Input
                     id="profile-pib"
-                    required
                     inputMode="numeric"
                     placeholder="9 cifara"
                     value={form.pib}
