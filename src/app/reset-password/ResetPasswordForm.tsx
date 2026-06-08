@@ -28,8 +28,9 @@ export default function ResetPasswordForm() {
     try {
       await api.post("/api/auth/reset-password", { token, password });
       router.push("/login");
-    } catch {
-      setError("Nevažeći ili istekao token");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(msg || "Nevažeći ili istekao token");
     } finally {
       setLoading(false);
     }

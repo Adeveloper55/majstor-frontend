@@ -22,7 +22,7 @@ export function TokenPackageCard({ pkg, selected, onSelect, onSubmit, loading, b
       <p className="text-lg font-bold text-slate-900">{pkg.name}</p>
       <p className="mt-2 text-4xl font-bold text-primary-800">{pkg.tokenAmount}</p>
       <p className="text-sm text-slate-500">tokena</p>
-      <p className="mt-3 text-xl font-semibold">{pkg.priceEur} EUR</p>
+      <p className="mt-3 text-xl font-semibold">{pkg.priceEur} RSD</p>
       <Button className="mt-4 w-full" variant={selected ? "default" : "outline"} onClick={onSelect}>
         {selected ? "Izabrano" : "Izaberi paket"}
       </Button>

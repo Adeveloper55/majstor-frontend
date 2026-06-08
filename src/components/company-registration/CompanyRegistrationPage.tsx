@@ -175,11 +175,14 @@ export function CompanyRegistrationPage() {
           {step === 5 && (
             <div className="space-y-4">
               <CheckCircle2 className="mx-auto h-14 w-14 text-brand-600" />
-              <h2 className="text-xl font-bold text-slate-900">Prijava je poslata na odobrenje</h2>
+              <h2 className="text-xl font-bold text-slate-900">Proverite email</h2>
               <p className="text-slate-600">
-                Hvala, <span className="font-semibold">{stepFour.companyName}</span>! Admin će pregledati
-                vašu prijavu. Kada bude odobrena, moći ćete se prijaviti na{" "}
+                Poslali smo link za potvrdu na{" "}
                 <span className="font-semibold">{stepOne.email}</span>.
+                Kliknite na link u emailu da biste završili prijavu preduzeća.
+              </p>
+              <p className="text-sm text-slate-500">
+                Admin pregleda prijavu tek nakon potvrde emaila. Kada bude odobrena, moći ćete se prijaviti.
               </p>
               <p className="text-sm text-slate-500">
                 {stepTwo.selectedServiceIds.length} delatnosti · {stepThree.selectedDistricts.length}{" "}

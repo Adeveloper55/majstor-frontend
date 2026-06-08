@@ -9,6 +9,8 @@ const publicPaths = [
   "/register/handyman",
   "/forgot-password",
   "/reset-password",
+  "/verify-email",
+  "/register/check-email",
   "/offline",
   "/contact",
   "/magazin",

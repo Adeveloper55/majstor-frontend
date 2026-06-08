@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { unwrapPage } from "@/lib/utils";
 import type { JobListing, JobApplication, Category } from "@/types";
+import { useAuthStore } from "@/store/authStore";
 
 export interface JobFiltersState {
   categories: number[];
@@ -17,10 +18,14 @@ export interface JobFiltersState {
 }
 
 export function useJobs(filters?: JobFiltersState, mode: "browse" | "my" = "browse") {
+  const token = useAuthStore((s) => s.token);
+  const myMode = mode === "my";
+
   return useQuery({
-    queryKey: ["jobs", mode, filters],
+    queryKey: ["jobs", mode, filters, myMode ? token : "public"],
+    enabled: myMode ? !!token : true,
     queryFn: async () => {
-      if (mode === "my") {
+      if (myMode) {
         const { data } = await api.get<{ content: JobListing[] }>("/api/jobs/my?size=50");
         return data.content;
       }

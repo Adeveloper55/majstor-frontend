@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api";
-import { useAuthStore } from "@/store/authStore";
+import { isValidSerbianPhone } from "@/lib/phoneUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,8 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterClientPage() {
   const router = useRouter();
-  const login = useAuthStore((s) => s.login);
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "", city: "" });
+  const [phoneError, setPhoneError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,10 +21,15 @@ export default function RegisterClientPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    if (form.phone.trim() && !isValidSerbianPhone(form.phone)) {
+      setPhoneError("Unesite ispravan srpski mobilni broj (npr. 0641234567).");
+      setLoading(false);
+      return;
+    }
+    setPhoneError("");
     try {
-      const { data } = await api.post("/api/auth/register/client", form);
-      login(data.token, data.role, data.user);
-      router.push("/dashboard");
+      const { data } = await api.post<{ message: string; email: string }>("/api/auth/register/client", form);
+      router.push(`/register/check-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || "Greška pri registraciji");
@@ -46,11 +51,16 @@ export default function RegisterClientPage() {
                 </Label>
                 <Input
                   id={field}
-                  type={field === "password" ? "password" : field === "email" ? "email" : "text"}
+                  type={field === "password" ? "password" : field === "email" ? "email" : field === "phone" ? "tel" : "text"}
                   required={field === "fullName" || field === "email" || field === "password"}
+                  placeholder={field === "phone" ? "npr. 0641234567" : undefined}
                   value={form[field]}
-                  onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                  onChange={(e) => {
+                    setForm({ ...form, [field]: e.target.value });
+                    if (field === "phone" && phoneError) setPhoneError("");
+                  }}
                 />
+                {field === "phone" && phoneError && <p className="mt-1 text-sm text-red-600">{phoneError}</p>}
               </div>
             ))}
             {error && <p className="text-sm text-red-600">{error}</p>}

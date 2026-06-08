@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +11,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/api/auth/forgot-password", { email });
-    setSent(true);
+    setLoading(true);
+    setError("");
+    try {
+      await api.post("/api/auth/forgot-password", { email: email.trim() });
+      setSent(true);
+    } catch {
+      setError("Greška pri slanju. Proverite email i pokušajte ponovo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,11 +34,26 @@ export default function ForgotPasswordPage() {
         <CardHeader><CardTitle>Zaboravljena lozinka</CardTitle></CardHeader>
         <CardContent>
           {sent ? (
-            <p className="text-gray-600">Ako nalog postoji, poslali smo vam link za reset lozinke.</p>
+            <div className="space-y-4 text-center">
+              <p className="text-gray-600">
+                Ako nalog postoji, poslali smo vam link za reset lozinke na <strong>{email.trim()}</strong>.
+                Proverite inbox i spam folder.
+              </p>
+              <Link href="/login">
+                <Button variant="outline" className="w-full">Nazad na prijavu</Button>
+              </Link>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <p className="text-sm text-gray-600">Unesite email sa kojim ste se registrovali.</p>
               <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-              <Button type="submit" className="w-full">Pošalji link</Button>
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Slanje..." : "Pošalji link"}
+              </Button>
+              <p className="text-center text-sm">
+                <Link href="/login" className="text-blue-800 hover:underline">Nazad na prijavu</Link>
+              </p>
             </form>
           )}
         </CardContent>

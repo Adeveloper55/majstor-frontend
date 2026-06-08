@@ -48,7 +48,7 @@ export default function AdminTokenRequestsPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-medium">{req.handyman?.fullName} ({req.handymanEmail})</p>
-                  <p className="text-sm text-gray-600">{req.tokenAmount} tokena • {req.amountExpected} EUR</p>
+                  <p className="text-sm text-gray-600">{req.tokenAmount} tokena • {req.amountExpected} RSD</p>
                   <p className="text-sm">Referenca: {req.paymentReference || "—"}</p>
                   <p className="text-xs text-gray-400">{new Date(req.createdAt).toLocaleString("sr")}</p>
                 </div>

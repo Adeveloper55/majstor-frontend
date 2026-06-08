@@ -37,6 +37,9 @@ export default function LoginPage() {
         setError("Backend nije dostupan. Pokreni backend (port 8080) i proveri PostgreSQL bazu.");
       } else if (axiosErr.response.status === 401) {
         setError("Pogrešan email ili lozinka");
+      } else if (axiosErr.response.status === 403) {
+        const msg = (axiosErr as { response?: { data?: { message?: string } } }).response?.data?.message;
+        setError(msg || "Email nije potvrđen. Proverite inbox.");
       } else {
         setError("Greška pri prijavi. Proveri da li backend radi ispravno.");
       }
@@ -62,6 +65,13 @@ export default function LoginPage() {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
+            {error.includes("potvrđen") && (
+              <p className="text-sm">
+                <Link href="/register/check-email" className="text-blue-800 hover:underline">
+                  Pošalji ponovo link za verifikaciju
+                </Link>
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Prijava..." : "Prijavi se"}
             </Button>

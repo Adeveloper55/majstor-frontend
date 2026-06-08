@@ -119,6 +119,7 @@ export interface TokenPurchaseRequest {
 
 export interface BankDetails {
   companyName: string;
+  companyPib?: string;
   bankName: string;
   bankAccount: string;
   paymentInstructions: string;

@@ -17,8 +17,9 @@ export function BankDetailsCard({ bank }: { bank: BankDetails }) {
 
   const rows = [
     { key: "company", label: "Firma", value: bank.companyName },
+    ...(bank.companyPib ? [{ key: "pib", label: "PIB", value: bank.companyPib }] : []),
     { key: "bank", label: "Banka", value: bank.bankName },
-    { key: "account", label: "Račun (IBAN)", value: bank.bankAccount },
+    { key: "account", label: "Račun", value: bank.bankAccount },
   ];
 
   return (

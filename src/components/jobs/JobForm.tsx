@@ -15,6 +15,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LocationPicker } from "@/components/maps/LocationPicker";
 import { CATEGORY_ICONS } from "@/constants";
 
+const DEFAULT_LAT = 43.3209;
+const DEFAULT_LON = 21.8958;
+
 const schema = z.object({
   categoryId: z.number({ message: "Izaberite kategoriju" }),
   title: z.string().min(3, "Naslov mora imati bar 3 karaktera"),
@@ -32,24 +35,18 @@ export function JobForm() {
   const router = useRouter();
   const { data: categories } = useCategories();
   const [step, setStep] = useState(1);
-  const [preview, setPreview] = useState<{ score: number; reason: string; tokenCost: number } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { images: [] },
   });
 
   const values = watch();
-
-  const loadPreview = async () => {
-    const { data } = await api.post("/api/jobs/score-preview", {
-      description: values.description,
-      categoryId: values.categoryId,
-    });
-    setPreview(data);
-  };
+  const selectedCategory = categories?.find((c: { id: number }) => c.id === values.categoryId);
+  const estimatedTokens = selectedCategory ? selectedCategory.baseTokenCost * 2 : null;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,25 +64,68 @@ export function JobForm() {
 
   const onSubmit = async (data: FormData) => {
     setError("");
+    setSubmitting(true);
     try {
-      const res = await api.post("/api/jobs", data);
+      const payload = {
+        categoryId: data.categoryId,
+        title: data.title.trim(),
+        description: data.description.trim(),
+        address: data.address?.trim() || undefined,
+        city: data.city?.trim() || undefined,
+        latitude: data.latitude ?? DEFAULT_LAT,
+        longitude: data.longitude ?? DEFAULT_LON,
+        images: data.images?.length ? data.images : undefined,
+      };
+      const res = await api.post("/api/jobs", payload);
       router.push(`/jobs/${res.data.id}`);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg || "Greška pri objavljivanju");
+      const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
+      if (axiosErr.response?.status === 403) {
+        setError("Samo klijenti mogu da objave oglas. Prijavite se kao klijent.");
+      } else {
+        setError(axiosErr.response?.data?.message || "Greška pri objavljivanju. Pokušajte ponovo.");
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  const onInvalid = () => {
+    if (!values.categoryId) {
+      setStep(1);
+      setError("Izaberite kategoriju posla.");
+      return;
+    }
+    if (!values.title || values.title.length < 3 || !values.description || values.description.length < 10) {
+      setStep(2);
+      setError("Naslov (min. 3 znaka) i opis (min. 10 znakova) su obavezni.");
+      return;
+    }
+    setError("Proverite sva polja i pokušajte ponovo.");
+  };
+
   const nextStep = async () => {
-    if (step === 2) await loadPreview();
+    setError("");
+    if (step === 1) {
+      if (!values.categoryId) {
+        setError("Izaberite kategoriju.");
+        return;
+      }
+    }
+    if (step === 2) {
+      const ok = await trigger(["title", "description"]);
+      if (!ok) return;
+      if (values.latitude == null) setValue("latitude", DEFAULT_LAT);
+      if (values.longitude == null) setValue("longitude", DEFAULT_LON);
+    }
     setStep(step + 1);
   };
 
   return (
     <Card className="mx-auto max-w-2xl">
-      <CardHeader><CardTitle>Novi oglas — korak {step}/4</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Novi oglas — korak {step}/3</CardTitle></CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
           {step === 1 && (
             <div className="max-h-96 overflow-y-auto rounded-lg border border-slate-100 p-2">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -93,12 +133,12 @@ export function JobForm() {
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => setValue("categoryId", cat.id)}
+                  onClick={() => setValue("categoryId", cat.id, { shouldValidate: true })}
                   className={`rounded-xl border-2 p-4 text-left ${values.categoryId === cat.id ? "border-primary-800 bg-primary-50" : "border-slate-200 hover:bg-slate-50"}`}
                 >
                   <span className="text-2xl">{CATEGORY_ICONS[cat.slug] || "🔨"}</span>
                   <p className="mt-2 font-semibold">{cat.name}</p>
-                  <p className="text-sm text-slate-500">{cat.baseTokenCost} baznih tokena</p>
+                  <p className="text-sm text-slate-500">od {cat.baseTokenCost} tokena</p>
                 </button>
               ))}
               {errors.categoryId && <p className="col-span-2 text-sm text-red-600">{errors.categoryId.message}</p>}
@@ -119,39 +159,49 @@ export function JobForm() {
           )}
 
           {step === 3 && (
-            <LocationPicker
-              address={values.address || ""}
-              city={values.city || ""}
-              latitude={values.latitude}
-              longitude={values.longitude}
-              onAddressChange={(v) => setValue("address", v)}
-              onCityChange={(v) => setValue("city", v)}
-              onLocationChange={(lat, lon) => { setValue("latitude", lat); setValue("longitude", lon); }}
-            />
-          )}
-
-          {step === 4 && (
-            preview ? (
-              <div className="rounded-xl bg-primary-50 p-5">
-                <p className="text-lg font-bold">AI ocena: {preview.score}/5</p>
-                <p className="mt-2 text-slate-600">{preview.reason}</p>
-                <p className="mt-3 font-semibold text-primary-900">
-                  Na osnovu opisa, ovaj posao je ocenjen složenošću {preview.score}/5. Majstori će potrošiti {preview.tokenCost} tokena za prijavu.
-                </p>
+            <>
+              <LocationPicker
+                address={values.address || ""}
+                city={values.city || ""}
+                latitude={values.latitude ?? DEFAULT_LAT}
+                longitude={values.longitude ?? DEFAULT_LON}
+                onAddressChange={(v) => setValue("address", v)}
+                onCityChange={(v) => setValue("city", v)}
+                onLocationChange={(lat, lon) => {
+                  setValue("latitude", lat);
+                  setValue("longitude", lon);
+                }}
+              />
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                <p className="font-semibold text-slate-900">Pregled</p>
+                <p className="mt-2"><strong>Kategorija:</strong> {selectedCategory?.name || "—"}</p>
+                <p><strong>Naslov:</strong> {values.title || "—"}</p>
+                <p><strong>Grad:</strong> {values.city || "—"}</p>
+                {estimatedTokens != null && (
+                  <p className="mt-2 text-primary-900">
+                    Majstori troše oko <strong>{estimatedTokens} tokena</strong> za prijavu na ovaj posao.
+                  </p>
+                )}
               </div>
-            ) : (
-              <p className="text-slate-500">Učitavanje AI procene...</p>
-            )
+            </>
           )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex justify-between pt-4">
-            {step > 1 && <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>Nazad</Button>}
-            {step < 4 ? (
-              <Button type="button" onClick={nextStep} disabled={step === 1 && !values.categoryId}>Dalje</Button>
+            {step > 1 && (
+              <Button type="button" variant="outline" onClick={() => { setError(""); setStep(step - 1); }}>
+                Nazad
+              </Button>
+            )}
+            {step < 3 ? (
+              <Button type="button" onClick={nextStep} className={step === 1 ? "ml-auto" : ""}>
+                Dalje
+              </Button>
             ) : (
-              <Button type="submit">Objavi oglas</Button>
+              <Button type="submit" disabled={submitting} className="ml-auto">
+                {submitting ? "Objavljivanje..." : "Objavi oglas"}
+              </Button>
             )}
           </div>
         </form>

@@ -23,6 +23,7 @@ const defaultFilters: JobFiltersState = {
 
 export default function JobsPage() {
   const { role, user } = useAuth();
+  if (!role) return <p className="p-6">Učitavanje...</p>;
   const isHandyman = role === "ROLE_HANDYMAN";
   const handymanCategoryIds = (user as Handyman | null)?.categoryIds ?? [];
   const [filters, setFilters] = useState<JobFiltersState>(defaultFilters);

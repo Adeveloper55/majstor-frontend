@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api";
 import { validatePib, normalizePib } from "@/lib/pibValidation";
-import { useAuthStore } from "@/store/authStore";
+import { isValidSerbianPhone } from "@/lib/phoneUtils";
 import { useCategories } from "@/hooks/useJobs";
 import { CategoryPicker } from "@/components/shared/CategoryPicker";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterHandymanPage() {
   const router = useRouter();
-  const login = useAuthStore((s) => s.login);
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "", city: "", bio: "", pib: "" });
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [pibError, setPibError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,13 @@ export default function RegisterHandymanPage() {
     setError("");
     setPibError("");
     setCategoryError("");
+
+    if (form.phone.trim() && !isValidSerbianPhone(form.phone)) {
+      setPhoneError("Unesite ispravan srpski mobilni broj (npr. 0641234567).");
+      setLoading(false);
+      return;
+    }
+    setPhoneError("");
 
     const pibValidation = validatePib(form.pib, false);
     if (pibValidation) {
@@ -55,9 +62,8 @@ export default function RegisterHandymanPage() {
         pib: normalizePib(form.pib) || undefined,
         categoryIds,
       };
-      const { data } = await api.post("/api/auth/register/handyman", payload);
-      login(data.token, data.role, data.user);
-      router.push("/dashboard");
+      const { data } = await api.post<{ message: string; email: string }>("/api/auth/register/handyman", payload);
+      router.push(`/register/check-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || "Greška pri registraciji");
@@ -75,7 +81,19 @@ export default function RegisterHandymanPage() {
             <div><Label>Ime i prezime</Label><Input required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} /></div>
             <div><Label>Email</Label><Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>Lozinka</Label><Input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
-            <div><Label>Telefon</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+            <div>
+              <Label>Telefon</Label>
+              <Input
+                type="tel"
+                placeholder="npr. 0641234567"
+                value={form.phone}
+                onChange={(e) => {
+                  setForm({ ...form, phone: e.target.value });
+                  if (phoneError) setPhoneError("");
+                }}
+              />
+              {phoneError && <p className="mt-1 text-sm text-red-600">{phoneError}</p>}
+            </div>
             <div><Label>Grad</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
             <div>
               <Label htmlFor="pib">PIB — Poreski identifikacioni broj (opciono)</Label>

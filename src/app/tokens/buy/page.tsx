@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -19,6 +19,12 @@ export default function BuyTokensPage() {
 
   const { data: packages } = useTokenPackages();
   const { data: bank } = useBankDetails();
+  const bestValuePackageId = useMemo(() => {
+    if (!packages?.length) return null;
+    return [...packages]
+      .sort((a, b) => Number(a.priceEur) / a.tokenAmount - Number(b.priceEur) / b.tokenAmount)[0]
+      ?.id ?? null;
+  }, [packages]);
 
   const handleSubmit = async () => {
     if (!selectedPackage) return;
@@ -42,7 +48,7 @@ export default function BuyTokensPage() {
         <h1 className="mb-6 text-2xl font-bold">Kupovina tokena</h1>
         {bank && <div className="mb-8"><BankDetailsCard bank={bank} /></div>}
         <div className="mb-6 grid gap-4 md:grid-cols-3">
-          {packages?.map((pkg, i) => (
+          {packages?.map((pkg) => (
             <TokenPackageCard
               key={pkg.id}
               pkg={pkg}
@@ -50,7 +56,7 @@ export default function BuyTokensPage() {
               onSelect={() => setSelectedPackage(pkg.id)}
               onSubmit={handleSubmit}
               loading={loading}
-              bestValue={i === 1}
+              bestValue={pkg.id === bestValuePackageId}
             />
           ))}
         </div>

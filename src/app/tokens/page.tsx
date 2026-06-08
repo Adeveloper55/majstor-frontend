@@ -21,7 +21,7 @@ export default function TokensPage() {
           {requests?.map((r) => (
             <div key={r.id} className="flex items-center justify-between rounded-lg border-2 border-slate-200 bg-white p-4">
               <div>
-                <p className="font-medium">{r.tokenAmount} tokena — {r.amountExpected} EUR</p>
+                <p className="font-medium">{r.tokenAmount} tokena — {r.amountExpected} RSD</p>
                 <p className="text-sm text-slate-500">{new Date(r.createdAt).toLocaleString("sr")}</p>
               </div>
               <Badge variant={r.status === "APPROVED" ? "success" : r.status === "REJECTED" ? "destructive" : "warning"}>
