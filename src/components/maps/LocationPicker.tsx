@@ -24,8 +24,8 @@ export function LocationPicker(props: LocationPickerProps) {
         <Input id="address" value={props.address} onChange={(e) => props.onAddressChange(e.target.value)} placeholder="Ulica i broj" />
       </div>
       <div>
-        <Label htmlFor="city">Grad</Label>
-        <Input id="city" value={props.city} onChange={(e) => props.onCityChange(e.target.value)} placeholder="Grad" />
+        <Label htmlFor="city">Grad *</Label>
+        <Input id="city" required value={props.city} onChange={(e) => props.onCityChange(e.target.value)} placeholder="Grad" />
       </div>
       <div>
         <Label>Lokacija na mapi (prevucite pin)</Label>

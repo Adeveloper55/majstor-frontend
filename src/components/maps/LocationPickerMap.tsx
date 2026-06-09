@@ -22,10 +22,22 @@ function DraggableMarker({ lat, lon, onChange }: { lat: number; lon: number; onC
   });
 
   useEffect(() => {
-    map.setView([lat, lon], 13);
+    map.setView([lat, lon], map.getZoom() || 13);
   }, [lat, lon, map]);
 
-  return <Marker position={[lat, lon]} icon={icon} draggable eventHandlers={{ dragend: (e) => onChange(e.target.getLatLng().lat, e.target.getLatLng().lng) }} />;
+  useEffect(() => {
+    const timer = window.setTimeout(() => map.invalidateSize(), 100);
+    return () => window.clearTimeout(timer);
+  }, [map]);
+
+  return (
+    <Marker
+      position={[lat, lon]}
+      icon={icon}
+      draggable
+      eventHandlers={{ dragend: (e) => onChange(e.target.getLatLng().lat, e.target.getLatLng().lng) }}
+    />
+  );
 }
 
 export default function LocationPickerMap({ lat, lon, onChange }: { lat: number; lon: number; onChange: (lat: number, lon: number) => void }) {

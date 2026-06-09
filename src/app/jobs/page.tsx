@@ -22,8 +22,7 @@ const defaultFilters: JobFiltersState = {
 };
 
 export default function JobsPage() {
-  const { role, user } = useAuth();
-  if (!role) return <p className="p-6">Učitavanje...</p>;
+  const { role, token, user } = useAuth();
   const isHandyman = role === "ROLE_HANDYMAN";
   const handymanCategoryIds = (user as Handyman | null)?.categoryIds ?? [];
   const [filters, setFilters] = useState<JobFiltersState>(defaultFilters);
@@ -43,6 +42,8 @@ export default function JobsPage() {
   }, [isHandyman, categories, handymanCategoryIds]);
   const { data: jobs, isLoading } = useJobs(isHandyman ? filters : undefined, isHandyman ? "browse" : "my");
   const needsCategories = isHandyman && handymanCategoryIds.length === 0;
+
+  if (!role || (!isHandyman && !token)) return <p className="p-6">Učitavanje...</p>;
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
@@ -77,7 +78,7 @@ export default function JobsPage() {
                   <JobsMap jobs={jobs || []} />
                 </div>
               )}
-              <JobList jobs={jobs || []} showDistance={isHandyman} emptyMessage={isHandyman ? "Nema poslova za zadate filtere." : "Nemate objavljenih poslova."} />
+              <JobList jobs={jobs || []} showDistance={isHandyman} hideTokenCost={!isHandyman} emptyMessage={isHandyman ? "Nema poslova za zadate filtere." : "Nemate objavljenih poslova."} />
             </>
           )}
         </div>

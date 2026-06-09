@@ -19,14 +19,28 @@ export interface JobFiltersState {
 
 export function useJobs(filters?: JobFiltersState, mode: "browse" | "my" = "browse") {
   const token = useAuthStore((s) => s.token);
+  const role = useAuthStore((s) => s.role);
   const myMode = mode === "my";
+  const handymanBrowse = !myMode && role === "ROLE_HANDYMAN";
 
   return useQuery({
-    queryKey: ["jobs", mode, filters, myMode ? token : "public"],
-    enabled: myMode ? !!token : true,
+    queryKey: ["jobs", mode, role, filters, token],
+    enabled: !!token && (myMode || handymanBrowse || (!myMode && role !== "ROLE_HANDYMAN")),
     queryFn: async () => {
       if (myMode) {
         const { data } = await api.get<{ content: JobListing[] }>("/api/jobs/my?size=50");
+        return data.content;
+      }
+      if (handymanBrowse) {
+        const params = new URLSearchParams({ size: "50", sort: filters?.sort || "newest" });
+        if (filters?.categories.length) params.set("categories", filters.categories.join(","));
+        if (filters?.city) params.set("city", filters.city);
+        if (filters?.radius) params.set("radius", String(filters.radius));
+        if (filters?.lat) params.set("lat", String(filters.lat));
+        if (filters?.lon) params.set("lon", String(filters.lon));
+        if (filters?.minTokenCost) params.set("minTokenCost", String(filters.minTokenCost));
+        if (filters?.maxTokenCost) params.set("maxTokenCost", String(filters.maxTokenCost));
+        const { data } = await api.get<{ content: JobListing[] }>(`/api/handymen/me/available-jobs?${params}`);
         return data.content;
       }
       const params = new URLSearchParams({ status: "OPEN", size: "50", sort: filters?.sort || "newest" });
@@ -44,10 +58,13 @@ export function useJobs(filters?: JobFiltersState, mode: "browse" | "my" = "brow
 }
 
 export function useJob(id: string) {
+  const token = useAuthStore((s) => s.token);
+
   return useQuery({
-    queryKey: ["job", id],
+    queryKey: ["job", id, token],
     queryFn: async () => (await api.get<JobListing>(`/api/jobs/${id}`)).data,
-    enabled: !!id,
+    enabled: !!id && !!token,
+    retry: 1,
   });
 }
 

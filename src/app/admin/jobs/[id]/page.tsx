@@ -7,6 +7,7 @@ import api from "@/lib/api";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { JobApplication, JobListing } from "@/types";
@@ -20,6 +21,9 @@ export default function AdminJobDetailPage() {
   const [selectedHandymanId, setSelectedHandymanId] = useState("");
   const [assigning, setAssigning] = useState(false);
   const [assignError, setAssignError] = useState("");
+  const [tokenCost, setTokenCost] = useState("5");
+  const [approving, setApproving] = useState(false);
+  const [approveError, setApproveError] = useState("");
 
   const { data: job, refetch } = useQuery({
     queryKey: ["admin-job", id],
@@ -31,11 +35,6 @@ export default function AdminJobDetailPage() {
     queryFn: async () => (await api.get<{ content: JobApplication[] }>(`/api/admin/jobs/${id}/applications?size=50`)).data.content,
     enabled: !!id,
   });
-
-  const remove = async () => {
-    await api.delete(`/api/admin/jobs/${id}`);
-    router.push("/admin/jobs");
-  };
 
   const assignHandyman = async (handymanId: string) => {
     setAssigning(true);
@@ -50,6 +49,32 @@ export default function AdminJobDetailPage() {
       setAssignError(msg || "Greška pri dodeli majstora");
     } finally {
       setAssigning(false);
+    }
+  };
+
+  const remove = async () => {
+    await api.delete(`/api/admin/jobs/${id}`);
+    router.push("/admin/jobs");
+  };
+
+  const approveJob = async () => {
+    const cost = parseInt(tokenCost, 10);
+    if (!cost || cost < 1) {
+      setApproveError("Unesite validan broj tokena (min. 1).");
+      return;
+    }
+    setApproving(true);
+    setApproveError("");
+    try {
+      await api.post(`/api/admin/jobs/${id}/approve`, { tokenCost: cost });
+      await refetch();
+      qc.invalidateQueries({ queryKey: ["admin-pending-jobs"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setApproveError(msg || "Greška pri odobravanju.");
+    } finally {
+      setApproving(false);
     }
   };
 
@@ -68,11 +93,38 @@ export default function AdminJobDetailPage() {
           <p>Grad: {job.city || "—"}</p>
           <p>Adresa: {job.address || "—"}</p>
           <p>Kategorija: {job.category?.name}</p>
-          <p>Tokeni: {job.tokenCost}</p>
+          <p>Tokeni: {job.status === "PENDING_APPROVAL" ? "— (postavite pri odobrenju)" : job.tokenCost}</p>
           {job.clientContact && (
             <p>Klijent: {job.clientContact.fullName} ({job.clientContact.email})</p>
           )}
         </div>
+
+        {job.status === "PENDING_APPROVAL" && (
+          <Card className="border-amber-200 bg-amber-50/40">
+            <CardHeader><CardTitle>Odobri oglas</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-slate-600">
+                Postavite koliko tokena košta ovaj posao za majstore. Nakon odobrenja oglas postaje vidljiv.
+              </p>
+              <div className="flex flex-wrap items-end gap-3">
+                <div>
+                  <label className="mb-1 block text-sm font-medium">Tokeni</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    className="w-32"
+                    value={tokenCost}
+                    onChange={(e) => setTokenCost(e.target.value)}
+                  />
+                </div>
+                <Button disabled={approving} onClick={approveJob}>
+                  {approving ? "Odobravanje..." : "Dozvoli posao"}
+                </Button>
+              </div>
+              {approveError && <p className="text-sm text-red-600">{approveError}</p>}
+            </CardContent>
+          </Card>
+        )}
 
         {job.status === "OPEN" && (
           <Card>

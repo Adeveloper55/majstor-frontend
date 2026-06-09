@@ -3,17 +3,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { StarRating } from "@/components/shared/StarRating";
-import { CATEGORY_ICONS, JOB_STATUS_LABELS } from "@/constants";
+import { CATEGORY_ICONS, JOB_STATUS_LABELS, CLIENT_JOB_APPROVAL_LABELS } from "@/constants";
 import type { JobListing } from "@/types";
 import Link from "next/link";
 
 interface JobCardProps {
   job: JobListing;
   showDistance?: boolean;
+  hideTokenCost?: boolean;
 }
 
-export function JobCard({ job, showDistance = false }: JobCardProps) {
+export function JobCard({ job, showDistance = false, hideTokenCost = false }: JobCardProps) {
   const icon = CATEGORY_ICONS[job.category?.slug || ""] || "🔨";
 
   return (
@@ -21,8 +21,8 @@ export function JobCard({ job, showDistance = false }: JobCardProps) {
       <CardContent className="p-5">
         <div className="mb-3 flex items-center justify-between gap-2">
           <Badge>{icon} {job.category?.name}</Badge>
-          <Badge variant={job.status === "OPEN" ? "success" : "default"}>
-            {JOB_STATUS_LABELS[job.status] || job.status}
+          <Badge variant={job.status === "OPEN" ? "success" : job.status === "PENDING_APPROVAL" ? "warning" : "default"}>
+            {(hideTokenCost ? CLIENT_JOB_APPROVAL_LABELS : JOB_STATUS_LABELS)[job.status] || job.status}
           </Badge>
         </div>
         <h3 className="mb-2 text-lg font-bold text-slate-900">{job.title}</h3>
@@ -30,10 +30,7 @@ export function JobCard({ job, showDistance = false }: JobCardProps) {
         <div className="mb-4 flex flex-wrap gap-2 text-sm text-slate-500">
           {job.city && <span>📍 {job.city}</span>}
           {showDistance && job.distance != null && <span>• {job.distance.toFixed(1)} km</span>}
-          <span>• {job.tokenCost} tokena</span>
-          {job.aiScore > 0 && (
-            <span className="flex items-center gap-1">• Složenost <StarRating value={job.aiScore} readonly size="sm" /></span>
-          )}
+          {!hideTokenCost && job.tokenCost != null && <span>• {job.tokenCost} tokena</span>}
           <span>• {new Date(job.createdAt).toLocaleDateString("sr")}</span>
         </div>
         <Link href={`/jobs/${job.id}`}>

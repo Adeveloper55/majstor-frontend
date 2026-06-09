@@ -62,7 +62,12 @@ export default function EditJobPage() {
   };
 
   if (!job) return <p className="p-8">Učitavanje...</p>;
-  if (job.status !== "OPEN") return <p className="p-8">Samo otvoreni oglasi mogu biti izmenjeni.</p>;
+  if (job.status !== "OPEN" && job.status !== "PENDING_APPROVAL") {
+    return <p className="p-8">Samo poslovi na čekanju ili odobreni oglasi mogu biti izmenjeni.</p>;
+  }
+  if (job.selectedHandymanId) {
+    return <p className="p-8">Ne možete menjati posao kojem je dodeljen majstor.</p>;
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">

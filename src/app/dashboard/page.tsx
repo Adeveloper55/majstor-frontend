@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { useJobs, useRecentApplications, useMyApplications, useAssignedJobs } from "@/hooks/useJobs";
+import { useJobs, useMyApplications, useAssignedJobs } from "@/hooks/useJobs";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { JobList } from "@/components/jobs/JobList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,8 +21,9 @@ export default function DashboardPage() {
 
 function ClientDashboard() {
   const { data: jobs } = useJobs(undefined, "my");
-  const { data: applications } = useRecentApplications();
+  const pendingJobs = jobs?.filter((j) => j.status === "PENDING_APPROVAL") || [];
   const activeJobs = jobs?.filter((j) => j.status === "OPEN" || j.status === "IN_PROGRESS") || [];
+  const assignedJobs = jobs?.filter((j) => j.status === "IN_PROGRESS" && j.assignedHandymanContact) || [];
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
@@ -32,24 +33,36 @@ function ClientDashboard() {
           <h1 className="text-2xl font-bold">Početna</h1>
           <Link href="/jobs/new" className="font-semibold text-primary-800 hover:underline">+ Objavi novi posao</Link>
         </div>
+        {pendingJobs.length > 0 && (
+          <Card className="border-amber-200 bg-amber-50/40">
+            <CardHeader><CardTitle>Na čekanju odobrenja ({pendingJobs.length})</CardTitle></CardHeader>
+            <CardContent>
+              <p className="mb-4 text-sm text-amber-900">Admin pregleda vaš oglas pre nego što postane vidljiv majstorima.</p>
+              <JobList jobs={pendingJobs.slice(0, 4)} hideTokenCost emptyMessage="" />
+            </CardContent>
+          </Card>
+        )}
         <Card>
           <CardHeader><CardTitle>Aktivni poslovi ({activeJobs.length})</CardTitle></CardHeader>
           <CardContent>
-            <JobList jobs={activeJobs.slice(0, 4)} emptyMessage="Nemate aktivnih poslova." />
+            <JobList jobs={activeJobs.slice(0, 4)} hideTokenCost emptyMessage="Nemate aktivnih poslova." />
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Nedavne prijave majstora</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Dodeljeni majstori ({assignedJobs.length})</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            {applications?.map((app) => (
-              <Link key={app.id} href={`/jobs/${app.jobListingId}/applications`} className="block rounded-lg border-2 border-slate-200 p-4 hover:bg-slate-50">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{(app as { jobTitle?: string }).jobTitle} — {app.handyman?.fullName}</span>
-                  <Badge>{app.status}</Badge>
-                </div>
+            {assignedJobs.slice(0, 4).map((job) => (
+              <Link key={job.id} href={`/jobs/${job.id}`} className="block rounded-lg border-2 border-green-200 bg-green-50/50 p-4 hover:bg-green-50">
+                <p className="font-semibold text-slate-900">{job.title}</p>
+                {job.assignedHandymanContact && (
+                  <p className="mt-1 text-sm text-slate-700">
+                    {job.assignedHandymanContact.fullName} •{" "}
+                    {job.assignedHandymanContact.phone || job.assignedHandymanContact.email}
+                  </p>
+                )}
               </Link>
             ))}
-            {!applications?.length && <p className="text-slate-500">Još nema prijava.</p>}
+            {!assignedJobs.length && <p className="text-slate-500">Još nema dodeljenog majstora.</p>}
           </CardContent>
         </Card>
       </main>

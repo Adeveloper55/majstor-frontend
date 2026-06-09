@@ -66,7 +66,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (/^\/jobs\/[^/]+\/applications/.test(pathname) && role !== "ROLE_CLIENT") {
+  if (/^\/jobs\/[^/]+\/applications/.test(pathname)) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

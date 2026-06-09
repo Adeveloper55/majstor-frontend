@@ -42,8 +42,18 @@ export const SORT_OPTIONS = [
 export const JOB_SORT_OPTIONS = SORT_OPTIONS;
 
 export const JOB_STATUS_LABELS: Record<string, string> = {
+  PENDING_APPROVAL: "Na čekanju odobrenja",
   OPEN: "Otvoren",
   IN_PROGRESS: "U toku",
+  COMPLETED: "Završen",
+  CANCELLED: "Otkazan",
+};
+
+/** Status oglasa iz perspektive klijenta (admin odobrenje) */
+export const CLIENT_JOB_APPROVAL_LABELS: Record<string, string> = {
+  PENDING_APPROVAL: "Nije odobren",
+  OPEN: "Odobren",
+  IN_PROGRESS: "Majstor dodeljen",
   COMPLETED: "Završen",
   CANCELLED: "Otkazan",
 };

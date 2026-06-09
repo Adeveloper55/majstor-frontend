@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/users", label: "Klijenti" },
   { href: "/admin/handymen", label: "Majstori" },
   { href: "/admin/jobs", label: "Poslovi" },
+  { href: "/admin/pending-jobs", label: "Poslovi na čekanju" },
   { href: "/admin/job-requests", label: "Zahtevi za posao" },
   { href: "/admin/token-requests", label: "Zahtevi za tokene" },
   { href: "/admin/company-registrations", label: "Registracije preduzeća" },

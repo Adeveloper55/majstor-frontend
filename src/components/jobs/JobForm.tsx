@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import api from "@/lib/api";
 import { useCategories } from "@/hooks/useJobs";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,10 +34,12 @@ type FormData = z.infer<typeof schema>;
 
 export function JobForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: categories } = useCategories();
   const [step, setStep] = useState(1);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [stepBusy, setStepBusy] = useState(false);
   const [error, setError] = useState("");
 
   const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormData>({
@@ -46,7 +49,6 @@ export function JobForm() {
 
   const values = watch();
   const selectedCategory = categories?.find((c: { id: number }) => c.id === values.categoryId);
-  const estimatedTokens = selectedCategory ? selectedCategory.baseTokenCost * 2 : null;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,6 +65,11 @@ export function JobForm() {
   };
 
   const onSubmit = async (data: FormData) => {
+    if (!data.city?.trim()) {
+      setError("Unesite grad pre objavljivanja.");
+      setStep(3);
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
@@ -77,6 +84,7 @@ export function JobForm() {
         images: data.images?.length ? data.images : undefined,
       };
       const res = await api.post("/api/jobs", payload);
+      await queryClient.invalidateQueries({ queryKey: ["jobs", "my"] });
       router.push(`/jobs/${res.data.id}`);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
@@ -101,35 +109,63 @@ export function JobForm() {
       setError("Naslov (min. 3 znaka) i opis (min. 10 znakova) su obavezni.");
       return;
     }
-    setError("Proverite sva polja i pokušajte ponovo.");
+    setStep(3);
+    setError("Unesite grad i lokaciju pre objavljivanja.");
   };
 
   const nextStep = async () => {
+    if (stepBusy || step >= 3) return;
+    setStepBusy(true);
     setError("");
-    if (step === 1) {
-      if (!values.categoryId) {
-        setError("Izaberite kategoriju.");
-        return;
+    try {
+      if (step === 1) {
+        if (!values.categoryId) {
+          setError("Izaberite kategoriju.");
+          return;
+        }
       }
+      if (step === 2) {
+        const ok = await trigger(["title", "description"]);
+        if (!ok) return;
+      }
+      setStep((s) => s + 1);
+    } finally {
+      setStepBusy(false);
     }
-    if (step === 2) {
-      const ok = await trigger(["title", "description"]);
-      if (!ok) return;
-      if (values.latitude == null) setValue("latitude", DEFAULT_LAT);
-      if (values.longitude == null) setValue("longitude", DEFAULT_LON);
+  };
+
+  useEffect(() => {
+    if (step !== 3) return;
+    if (values.latitude == null) setValue("latitude", DEFAULT_LAT, { shouldDirty: true });
+    if (values.longitude == null) setValue("longitude", DEFAULT_LON, { shouldDirty: true });
+  }, [step, setValue, values.latitude, values.longitude]);
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (step < 3) {
+      void nextStep();
+      return;
     }
-    setStep(step + 1);
+    void handleSubmit(onSubmit, onInvalid)(e);
+  };
+
+  const handleFormKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== "Enter" || step >= 3) return;
+    const tag = (e.target as HTMLElement).tagName;
+    if (tag === "TEXTAREA") return;
+    e.preventDefault();
+    void nextStep();
   };
 
   return (
     <Card className="mx-auto max-w-2xl">
       <CardHeader><CardTitle>Novi oglas — korak {step}/3</CardTitle></CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
+        <form onSubmit={handleFormSubmit} onKeyDown={handleFormKeyDown} className="space-y-4">
           {step === 1 && (
             <div className="max-h-96 overflow-y-auto rounded-lg border border-slate-100 p-2">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {categories?.map((cat: { id: number; name: string; slug: string; baseTokenCost: number }) => (
+              {categories?.map((cat: { id: number; name: string; slug: string }) => (
                 <button
                   key={cat.id}
                   type="button"
@@ -138,7 +174,6 @@ export function JobForm() {
                 >
                   <span className="text-2xl">{CATEGORY_ICONS[cat.slug] || "🔨"}</span>
                   <p className="mt-2 font-semibold">{cat.name}</p>
-                  <p className="text-sm text-slate-500">od {cat.baseTokenCost} tokena</p>
                 </button>
               ))}
               {errors.categoryId && <p className="col-span-2 text-sm text-red-600">{errors.categoryId.message}</p>}
@@ -161,15 +196,16 @@ export function JobForm() {
           {step === 3 && (
             <>
               <LocationPicker
+                key="job-location-picker"
                 address={values.address || ""}
                 city={values.city || ""}
                 latitude={values.latitude ?? DEFAULT_LAT}
                 longitude={values.longitude ?? DEFAULT_LON}
-                onAddressChange={(v) => setValue("address", v)}
-                onCityChange={(v) => setValue("city", v)}
+                onAddressChange={(v) => setValue("address", v, { shouldDirty: true })}
+                onCityChange={(v) => setValue("city", v, { shouldDirty: true })}
                 onLocationChange={(lat, lon) => {
-                  setValue("latitude", lat);
-                  setValue("longitude", lon);
+                  setValue("latitude", lat, { shouldDirty: true });
+                  setValue("longitude", lon, { shouldDirty: true });
                 }}
               />
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
@@ -177,11 +213,9 @@ export function JobForm() {
                 <p className="mt-2"><strong>Kategorija:</strong> {selectedCategory?.name || "—"}</p>
                 <p><strong>Naslov:</strong> {values.title || "—"}</p>
                 <p><strong>Grad:</strong> {values.city || "—"}</p>
-                {estimatedTokens != null && (
-                  <p className="mt-2 text-primary-900">
-                    Majstori troše oko <strong>{estimatedTokens} tokena</strong> za prijavu na ovaj posao.
-                  </p>
-                )}
+                <p className="mt-2 text-slate-600">
+                  Nakon slanja, admin pregleda oglas pre objavljivanja majstorima.
+                </p>
               </div>
             </>
           )}
@@ -195,8 +229,8 @@ export function JobForm() {
               </Button>
             )}
             {step < 3 ? (
-              <Button type="button" onClick={nextStep} className={step === 1 ? "ml-auto" : ""}>
-                Dalje
+              <Button type="button" onClick={() => void nextStep()} disabled={stepBusy} className={step === 1 ? "ml-auto" : ""}>
+                {stepBusy ? "Provera..." : "Dalje"}
               </Button>
             ) : (
               <Button type="submit" disabled={submitting} className="ml-auto">

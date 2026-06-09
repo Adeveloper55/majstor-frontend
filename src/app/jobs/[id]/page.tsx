@@ -8,23 +8,30 @@ import { useAuth } from "@/hooks/useAuth";
 import { useJob } from "@/hooks/useJobs";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-import { StarRating } from "@/components/shared/StarRating";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CATEGORY_ICONS, JOB_STATUS_LABELS } from "@/constants";
+import { CATEGORY_ICONS, JOB_STATUS_LABELS, CLIENT_JOB_APPROVAL_LABELS } from "@/constants";
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { role, user } = useAuth();
+  const { role, user, token } = useAuth();
   const router = useRouter();
   const [coverMessage, setCoverMessage] = useState("");
   const [applying, setApplying] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [error, setError] = useState("");
 
-  const { data: job, refetch } = useJob(id);
+  const { data: job, refetch, isLoading, isError } = useJob(id);
+
+  const isClientOwner = role === "ROLE_CLIENT" && job?.userId === user?.id;
+  const clientCanCancel = isClientOwner
+    && !job?.selectedHandymanId
+    && (job?.status === "PENDING_APPROVAL" || job?.status === "OPEN");
+  const clientCanEdit = isClientOwner
+    && !job?.selectedHandymanId
+    && (job?.status === "PENDING_APPROVAL" || job?.status === "OPEN");
 
   const handleApply = async () => {
     setApplying(true);
@@ -50,7 +57,18 @@ export default function JobDetailPage() {
     router.push("/jobs");
   };
 
-  if (!job) return <p className="p-8">Učitavanje...</p>;
+  if (!token || isLoading) return <p className="p-8">Učitavanje...</p>;
+  if (isError || !job) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)]">
+        <Sidebar />
+        <main className="flex-1 p-6">
+          <p className="text-red-600">Posao nije pronađen ili nemate pristup.</p>
+          <Link href="/jobs" className="mt-4 inline-block text-primary-800 hover:underline">← Nazad na moje poslove</Link>
+        </main>
+      </div>
+    );
+  }
 
   const icon = CATEGORY_ICONS[job.category?.slug || ""] || "🔨";
 
@@ -62,8 +80,10 @@ export default function JobDetailPage() {
           <CardHeader>
             <div className="flex flex-wrap items-center gap-2">
               <Badge>{icon} {job.category?.name}</Badge>
-              <Badge variant={job.status === "OPEN" ? "success" : "default"}>
-                {JOB_STATUS_LABELS[job.status] || job.status}
+              <Badge variant={job.status === "OPEN" ? "success" : job.status === "PENDING_APPROVAL" ? "warning" : "default"}>
+                {role === "ROLE_CLIENT"
+                  ? (CLIENT_JOB_APPROVAL_LABELS[job.status] || JOB_STATUS_LABELS[job.status] || job.status)
+                  : (JOB_STATUS_LABELS[job.status] || job.status)}
               </Badge>
             </div>
             <CardTitle className="mt-3 text-2xl">{job.title}</CardTitle>
@@ -84,25 +104,53 @@ export default function JobDetailPage() {
             <div className="grid gap-3 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-2">
               <p><strong>Grad:</strong> {job.city || "—"}</p>
               {job.address && <p><strong>Adresa:</strong> {job.address}</p>}
-              <p><strong>Tokeni (pri odobrenju):</strong> {job.tokenCost}</p>
-              <div className="flex items-center gap-2">
-                <strong>Složenost:</strong>
-                <StarRating value={job.aiScore} readonly size="sm" />
-              </div>
+              {role !== "ROLE_CLIENT" && job.tokenCost != null && (
+                <p><strong>Tokeni:</strong> {job.tokenCost}</p>
+              )}
             </div>
 
-            {role === "ROLE_CLIENT" && job.status === "OPEN" && (
-              <div className="flex flex-wrap gap-3 border-t pt-5">
-                <Link href={`/jobs/${id}/edit`}><Button variant="outline">Izmeni oglas</Button></Link>
-                <Button variant="destructive" onClick={() => setCancelOpen(true)}>Otkaži oglas</Button>
-                <Link href={`/jobs/${id}/applications`}><Button>Prijave majstora →</Button></Link>
+            {role === "ROLE_CLIENT" && job.status === "PENDING_APPROVAL" && (
+              <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <p className="font-semibold">Status: Nije odobren</p>
+                <p className="mt-1">Admin pregleda vaš oglas. Kada ga odobri, postaće vidljiv majstorima.</p>
               </div>
             )}
 
-            {role === "ROLE_CLIENT" && job.status === "IN_PROGRESS" && (
-              <div className="rounded-xl border-2 border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-                <p className="font-semibold">Admin je dodelio majstora na vaš posao.</p>
-                <p className="mt-1">Majstor će vas kontaktirati da dogovorite detalje rada. Kada posao bude završen, označite ga kao završen.</p>
+            {role === "ROLE_CLIENT" && job.status === "OPEN" && !job.selectedHandymanId && (
+              <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4 text-sm text-green-900">
+                <p className="font-semibold">Status: Odobren</p>
+                <p className="mt-1">Oglas je vidljiv majstorima. Admin će dodeliti majstora kada se neko prijavi.</p>
+              </div>
+            )}
+
+            {clientCanEdit && (
+              <div className="flex flex-wrap gap-3 border-t pt-5">
+                <Link href={`/jobs/${id}/edit`}><Button variant="outline">Izmeni oglas</Button></Link>
+                {clientCanCancel && (
+                  <Button variant="destructive" onClick={() => setCancelOpen(true)}>Obriši oglas</Button>
+                )}
+              </div>
+            )}
+
+            {role === "ROLE_CLIENT" && (job.status === "IN_PROGRESS" || job.status === "COMPLETED") && job.assignedHandymanContact && (
+              <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4">
+                <h3 className="mb-1 font-bold text-green-900">Dodeljeni majstor</h3>
+                <p className="mb-3 text-sm text-green-800">Kontaktirajte majstora da dogovorite detalje rada.</p>
+                <div className="grid gap-2 text-sm sm:grid-cols-2">
+                  <p><strong>Ime:</strong> {job.assignedHandymanContact.fullName}</p>
+                  <p><strong>Email:</strong>{" "}
+                    <a href={`mailto:${job.assignedHandymanContact.email}`} className="text-primary-800 hover:underline">
+                      {job.assignedHandymanContact.email}
+                    </a>
+                  </p>
+                  {job.assignedHandymanContact.phone && (
+                    <p><strong>Telefon:</strong>{" "}
+                      <a href={`tel:${job.assignedHandymanContact.phone}`} className="text-primary-800 hover:underline">
+                        {job.assignedHandymanContact.phone}
+                      </a>
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
@@ -136,7 +184,7 @@ export default function JobDetailPage() {
                 <p className="text-sm text-slate-600">
                   Prijava je besplatna. Tokeni ({job.tokenCost}) skidaju se tek kada admin odobri i dodeli vam posao.
                 </p>
-                <Textarea placeholder="Poruka za klijenta (opciono)" value={coverMessage} onChange={(e) => setCoverMessage(e.target.value)} />
+                <Textarea placeholder="Poruka za admina (opciono)" value={coverMessage} onChange={(e) => setCoverMessage(e.target.value)} />
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 <Button onClick={handleApply} disabled={applying}>{applying ? "Prijava..." : "Prijavi se"}</Button>
               </div>
@@ -157,9 +205,9 @@ export default function JobDetailPage() {
         <ConfirmDialog
           open={cancelOpen}
           onOpenChange={setCancelOpen}
-          title="Otkaži oglas?"
-          description="Oglas će biti označen kao otkazan."
-          confirmLabel="Otkaži oglas"
+          title="Obriši oglas?"
+          description="Oglas će biti uklonjen. Ovo nije moguće ako je majstor već dodeljen."
+          confirmLabel="Obriši oglas"
           onConfirm={handleCancel}
         />
       </main>

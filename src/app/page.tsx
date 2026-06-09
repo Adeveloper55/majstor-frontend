@@ -28,11 +28,11 @@ const popularCategories = [
 const steps = [
   {
     title: "Objavite posao",
-    desc: "Klijent opiše problem, AI proceni složenost i cenu u tokenima.",
+    desc: "Klijent opiše posao i oglas odmah postaje vidljiv majstorima.",
   },
   {
     title: "Majstori se prijave",
-    desc: "Verifikovani majstori troše tokene da pošalju ponudu.",
+    desc: "Verifikovani majstori se besplatno prijave na posao.",
   },
   {
     title: "Admin dodeli majstora",
@@ -42,7 +42,7 @@ const steps = [
 
 const features = [
   { icon: ShieldCheck, title: "Pouzdano", desc: "Recenzije i ocene nakon svakog završenog posla." },
-  { icon: Coins, title: "Fer cena", desc: "AI ocena složenosti određuje koliko tokena košta prijava." },
+  { icon: Coins, title: "Fer cena", desc: "Admin određuje koliko tokena košta dodela na posao." },
   { icon: Users, title: "Jednostavno", desc: "Dizajn prilagođen svima — bez komplikacija." },
 ];
 

@@ -54,6 +54,12 @@ export interface ClientContact {
   city?: string;
 }
 
+export interface HandymanContact {
+  fullName: string;
+  email: string;
+  phone?: string;
+}
+
 export interface JobListing {
   id: string;
   userId: string;
@@ -67,12 +73,13 @@ export interface JobListing {
   longitude?: number;
   images?: string[];
   aiScore: number;
-  tokenCost: number;
-  status: "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  tokenCost?: number | null;
+  status: "PENDING_APPROVAL" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   selectedHandymanId?: string;
   createdAt: string;
   distance?: number;
   clientContact?: ClientContact;
+  assignedHandymanContact?: HandymanContact;
 }
 
 export interface JobApplication {

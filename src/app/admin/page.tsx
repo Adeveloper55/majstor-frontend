@@ -16,6 +16,7 @@ export default function AdminDashboardPage() {
     { label: "Majstori", key: "totalHandymen", color: "bg-indigo-500" },
     { label: "Poslovi", key: "totalJobs", color: "bg-purple-500" },
     { label: "Otvoreni", key: "openJobs", color: "bg-green-500" },
+    { label: "Poslovi na čekanju", key: "pendingJobApprovals", color: "bg-yellow-500" },
     { label: "Zahtevi (tokeni)", key: "pendingTokenRequests", color: "bg-amber-500" },
     { label: "Zahtevi (poslovi)", key: "pendingJobApplications", color: "bg-orange-500" },
     { label: "Registracije preduzeća", key: "pendingCompanyRegistrations", color: "bg-teal-500" },
