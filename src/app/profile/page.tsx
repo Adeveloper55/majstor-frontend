@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useCategories } from "@/hooks/useJobs";
@@ -9,23 +8,18 @@ import { useReviewsForUser, useReviewsForHandyman } from "@/hooks/useReviews";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { AvatarUpload } from "@/components/shared/AvatarUpload";
 import { CategoryPicker } from "@/components/shared/CategoryPicker";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { ReviewCard } from "@/components/reviews/ReviewCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuthStore } from "@/store/authStore";
 import { validatePib, normalizePib } from "@/lib/pibValidation";
 import type { Handyman } from "@/types";
 
 export default function ProfilePage() {
   const { user, role, login, token } = useAuth();
-  const router = useRouter();
-  const logout = useAuthStore((s) => s.logout);
   const { data: allCategories } = useCategories();
   const handymanUser = user as Handyman | null;
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [form, setForm] = useState({
     fullName: user?.fullName || "",
     phone: user?.phone || "",
@@ -86,13 +80,6 @@ export default function ProfilePage() {
     setSaved(true);
   };
 
-  const deactivate = async () => {
-    const url = role === "ROLE_HANDYMAN" ? "/api/handymen/me" : "/api/users/me";
-    await api.delete(url);
-    logout();
-    router.push("/login");
-  };
-
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
       <Sidebar />
@@ -142,9 +129,6 @@ export default function ProfilePage() {
             )}
             <Button onClick={handleSave}>Sačuvaj</Button>
             {saved && <p className="text-sm text-green-600">Sačuvano!</p>}
-            <div className="border-t pt-4">
-              <Button variant="destructive" onClick={() => setConfirmOpen(true)}>Deaktiviraj nalog</Button>
-            </div>
           </CardContent>
         </Card>
         <div>
@@ -154,14 +138,6 @@ export default function ProfilePage() {
             {!reviews?.length && <p className="text-slate-500">Nemate recenzija.</p>}
           </div>
         </div>
-        <ConfirmDialog
-          open={confirmOpen}
-          onOpenChange={setConfirmOpen}
-          title="Deaktivirati nalog?"
-          description="Nećete moći da se prijavite dok admin ne reaktivira nalog."
-          confirmLabel="Deaktiviraj"
-          onConfirm={deactivate}
-        />
       </main>
     </div>
   );

@@ -6,12 +6,16 @@ import api from "@/lib/api";
 import { useJob, useCategories } from "@/hooks/useJobs";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { LocationPicker } from "@/components/maps/LocationPicker";
+import { JobImageUpload } from "@/components/jobs/JobImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_ICONS } from "@/constants";
+
+const DEFAULT_LAT = 43.3209;
+const DEFAULT_LON = 21.8958;
 
 export default function EditJobPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +30,7 @@ export default function EditJobPage() {
     city: "",
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined,
+    locationPinned: false,
     images: [] as string[],
   });
   const [error, setError] = useState("");
@@ -41,6 +46,7 @@ export default function EditJobPage() {
         city: job.city || "",
         latitude: job.latitude,
         longitude: job.longitude,
+        locationPinned: Boolean(job.locationPinned),
         images: job.images || [],
       });
     }
@@ -48,10 +54,24 @@ export default function EditJobPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.locationPinned || form.latitude == null || form.longitude == null) {
+      setError("Prevucite pin na mapi da sačuvate lokaciju.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
-      await api.put(`/api/jobs/${id}`, form);
+      await api.put(`/api/jobs/${id}`, {
+        categoryId: form.categoryId,
+        title: form.title,
+        description: form.description,
+        address: form.address || undefined,
+        city: form.city || undefined,
+        locationPinned: form.locationPinned,
+        latitude: form.locationPinned ? form.latitude : undefined,
+        longitude: form.locationPinned ? form.longitude : undefined,
+        images: form.images.length ? form.images : undefined,
+      });
       router.push(`/jobs/${id}`);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -96,15 +116,23 @@ export default function EditJobPage() {
               </div>
               <div><Label>Naslov</Label><Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
               <div><Label>Opis</Label><Textarea required rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              <JobImageUpload
+                images={form.images}
+                onChange={(images) => setForm({ ...form, images })}
+              />
               <LocationPicker
                 address={form.address}
                 city={form.city}
-                latitude={form.latitude}
-                longitude={form.longitude}
+                latitude={form.latitude ?? DEFAULT_LAT}
+                longitude={form.longitude ?? DEFAULT_LON}
+                locationPinned={form.locationPinned}
                 onAddressChange={(v) => setForm({ ...form, address: v })}
                 onCityChange={(v) => setForm({ ...form, city: v })}
-                onLocationChange={(lat, lon) => setForm({ ...form, latitude: lat, longitude: lon })}
+                onLocationChange={(lat, lon) => setForm({ ...form, latitude: lat, longitude: lon, locationPinned: true })}
               />
+              {form.locationPinned && form.latitude != null && form.longitude != null && (
+                <p className="text-sm text-green-700">Lokacija je označena na mapi.</p>
+              )}
               {error && <p className="text-sm text-red-600">{error}</p>}
               <div className="flex gap-3">
                 <Button type="submit" disabled={loading}>{loading ? "Čuvanje..." : "Sačuvaj izmene"}</Button>

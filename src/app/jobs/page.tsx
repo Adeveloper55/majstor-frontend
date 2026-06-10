@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useJobs, type JobFiltersState } from "@/hooks/useJobs";
@@ -8,7 +8,6 @@ import { useCategories } from "@/hooks/useJobs";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { JobFilters } from "@/components/jobs/JobFilters";
 import { JobList } from "@/components/jobs/JobList";
-import { JobsMap } from "@/components/maps/JobsMap";
 import { Button } from "@/components/ui/button";
 import type { Handyman } from "@/types";
 
@@ -27,13 +26,6 @@ export default function JobsPage() {
   const handymanCategoryIds = (user as Handyman | null)?.categoryIds ?? [];
   const [filters, setFilters] = useState<JobFiltersState>(defaultFilters);
 
-  useEffect(() => {
-    if (isHandyman && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        setFilters((f) => ({ ...f, lat: pos.coords.latitude, lon: pos.coords.longitude }));
-      });
-    }
-  }, [isHandyman]);
   const { data: categories } = useCategories();
   const visibleCategories = useMemo(() => {
     if (!isHandyman || !categories) return categories;
@@ -72,12 +64,6 @@ export default function JobsPage() {
             </div>
           ) : isLoading ? <p>Učitavanje...</p> : (
             <>
-              {isHandyman && (jobs?.length ?? 0) > 0 && (
-                <div className="mb-6">
-                  <h2 className="mb-3 text-lg font-bold">Mapa poslova</h2>
-                  <JobsMap jobs={jobs || []} />
-                </div>
-              )}
               <JobList jobs={jobs || []} showDistance={isHandyman} hideTokenCost={!isHandyman} emptyMessage={isHandyman ? "Nema poslova za zadate filtere." : "Nemate objavljenih poslova."} />
             </>
           )}

@@ -78,15 +78,17 @@ export function SiteHeaderNav({
               onOpen={() => setOpenMenu("alati")}
               onClose={closeMenus}
             />
-            <Link
-              href="/registracija-preduzeca"
-              className={cn(
-                buttonVariants({ size: "sm" }),
-                "ml-1 whitespace-nowrap bg-brand-600 text-white hover:bg-brand-700"
-              )}
-            >
-              Da li ste izvođač?
-            </Link>
+            {!isLoggedIn && (
+              <Link
+                href="/registracija-preduzeca"
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  "ml-1 whitespace-nowrap bg-brand-600 text-white hover:bg-brand-700"
+                )}
+              >
+                Da li ste izvođač?
+              </Link>
+            )}
           </nav>
 
           {/* Desna strana — auth ili korisnički panel */}

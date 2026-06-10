@@ -11,6 +11,7 @@ interface LocationPickerProps {
   city: string;
   latitude?: number;
   longitude?: number;
+  locationPinned?: boolean;
   onAddressChange: (v: string) => void;
   onCityChange: (v: string) => void;
   onLocationChange: (lat: number, lon: number) => void;
@@ -28,12 +29,20 @@ export function LocationPicker(props: LocationPickerProps) {
         <Input id="city" required value={props.city} onChange={(e) => props.onCityChange(e.target.value)} placeholder="Grad" />
       </div>
       <div>
-        <Label>Lokacija na mapi (prevucite pin)</Label>
+        <Label>Lokacija na mapi (kliknite ili prevucite pin)</Label>
+        <p className="mb-2 text-xs text-slate-500">
+          Majstor će videti tačnu tačku koju ovde označite.
+        </p>
         <MapInner
           lat={props.latitude ?? 44.8176}
           lon={props.longitude ?? 20.4633}
           onChange={props.onLocationChange}
         />
+        {props.locationPinned && props.latitude != null && props.longitude != null && (
+          <p className="mt-2 text-sm font-medium text-green-700">
+            ✓ Lokacija sačuvana ({props.latitude.toFixed(5)}, {props.longitude.toFixed(5)})
+          </p>
+        )}
       </div>
     </div>
   );

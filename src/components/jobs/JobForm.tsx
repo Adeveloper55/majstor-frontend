@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LocationPicker } from "@/components/maps/LocationPicker";
+import { JobImageUpload } from "@/components/jobs/JobImageUpload";
 import { CATEGORY_ICONS } from "@/constants";
 
 const DEFAULT_LAT = 43.3209;
@@ -37,32 +38,19 @@ export function JobForm() {
   const queryClient = useQueryClient();
   const { data: categories } = useCategories();
   const [step, setStep] = useState(1);
-  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [stepBusy, setStepBusy] = useState(false);
+  const [locationPinned, setLocationPinned] = useState(false);
+  const savedLocationRef = useRef<{ lat?: number; lon?: number }>({});
   const [error, setError] = useState("");
 
   const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { images: [] },
+    defaultValues: { images: [], latitude: undefined, longitude: undefined },
   });
 
   const values = watch();
   const selectedCategory = categories?.find((c: { id: number }) => c.id === values.categoryId);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const { data } = await api.post<{ url: string }>("/api/uploads/image", formData);
-      setValue("images", [...(values.images || []), data.url]);
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const onSubmit = async (data: FormData) => {
     if (!data.city?.trim()) {
@@ -70,17 +58,25 @@ export function JobForm() {
       setStep(3);
       return;
     }
+    if (!locationPinned || savedLocationRef.current.lat == null || savedLocationRef.current.lon == null) {
+      setError("Kliknite ili prevucite pin na mapi da označite tačnu lokaciju posla.");
+      setStep(3);
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
+      const lat = savedLocationRef.current.lat;
+      const lon = savedLocationRef.current.lon;
       const payload = {
         categoryId: data.categoryId,
         title: data.title.trim(),
         description: data.description.trim(),
         address: data.address?.trim() || undefined,
         city: data.city?.trim() || undefined,
-        latitude: data.latitude ?? DEFAULT_LAT,
-        longitude: data.longitude ?? DEFAULT_LON,
+        locationPinned: true,
+        latitude: lat,
+        longitude: lon,
         images: data.images?.length ? data.images : undefined,
       };
       const res = await api.post("/api/jobs", payload);
@@ -134,12 +130,6 @@ export function JobForm() {
     }
   };
 
-  useEffect(() => {
-    if (step !== 3) return;
-    if (values.latitude == null) setValue("latitude", DEFAULT_LAT, { shouldDirty: true });
-    if (values.longitude == null) setValue("longitude", DEFAULT_LON, { shouldDirty: true });
-  }, [step, setValue, values.latitude, values.longitude]);
-
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
@@ -186,9 +176,10 @@ export function JobForm() {
               <div><Label>Naslov</Label><Input {...register("title")} />{errors.title && <p className="text-sm text-red-600">{errors.title.message}</p>}</div>
               <div><Label>Opis</Label><Textarea rows={5} {...register("description")} />{errors.description && <p className="text-sm text-red-600">{errors.description.message}</p>}</div>
               <div>
-                <Label>Slike (opciono)</Label>
-                <Input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-                {values.images?.map((url, i) => <p key={i} className="text-xs text-green-600 truncate">✓ Slika {i + 1} otpremljena</p>)}
+                <JobImageUpload
+                  images={values.images || []}
+                  onChange={(images) => setValue("images", images, { shouldDirty: true })}
+                />
               </div>
             </>
           )}
@@ -201,11 +192,14 @@ export function JobForm() {
                 city={values.city || ""}
                 latitude={values.latitude ?? DEFAULT_LAT}
                 longitude={values.longitude ?? DEFAULT_LON}
+                locationPinned={locationPinned}
                 onAddressChange={(v) => setValue("address", v, { shouldDirty: true })}
                 onCityChange={(v) => setValue("city", v, { shouldDirty: true })}
                 onLocationChange={(lat, lon) => {
-                  setValue("latitude", lat, { shouldDirty: true });
-                  setValue("longitude", lon, { shouldDirty: true });
+                  savedLocationRef.current = { lat, lon };
+                  setValue("latitude", lat, { shouldDirty: true, shouldValidate: true });
+                  setValue("longitude", lon, { shouldDirty: true, shouldValidate: true });
+                  setLocationPinned(true);
                 }}
               />
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">

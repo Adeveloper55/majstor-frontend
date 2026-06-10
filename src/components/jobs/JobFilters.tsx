@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { SORT_OPTIONS } from "@/constants";
+import { SERBIAN_CITIES, getCityCoordinates } from "@/constants/serbianCities";
 import type { JobFiltersState } from "@/hooks/useJobs";
 import type { Category } from "@/types";
 
@@ -24,17 +25,32 @@ const defaultFilters: JobFiltersState = {
   sort: "newest",
 };
 
+const CITY_OPTIONS = [
+  { value: "", label: "Svi gradovi" },
+  ...SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name })),
+];
+
 export function JobFilters({ categories, filters, onChange }: JobFiltersProps) {
   const [local, setLocal] = useState(filters);
 
   useEffect(() => {
-    if (!local.lat && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setLocal((f) => ({ ...f, lat: pos.coords.latitude, lon: pos.coords.longitude })),
-        () => {}
-      );
-    }
-  }, [local.lat]);
+    setLocal(filters);
+  }, [filters]);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocal((current) => {
+          if (current.city || current.lat) return current;
+          const next = { ...current, lat: pos.coords.latitude, lon: pos.coords.longitude };
+          onChange(next);
+          return next;
+        });
+      },
+      () => {}
+    );
+  }, [onChange]);
 
   const toggleCategory = (id: number) => {
     setLocal((f) => ({
@@ -45,9 +61,22 @@ export function JobFilters({ categories, filters, onChange }: JobFiltersProps) {
     }));
   };
 
+  const applyCity = (city: string) => {
+    const coords = city ? getCityCoordinates(city) : undefined;
+    const next: JobFiltersState = {
+      ...local,
+      city,
+      lat: coords?.latitude,
+      lon: coords?.longitude,
+    };
+    setLocal(next);
+    onChange(next);
+  };
+
   const apply = () => onChange(local);
+
   const reset = () => {
-    const resetState = { ...defaultFilters, lat: local.lat, lon: local.lon };
+    const resetState = { ...defaultFilters };
     setLocal(resetState);
     onChange(resetState);
   };
@@ -79,23 +108,31 @@ export function JobFilters({ categories, filters, onChange }: JobFiltersProps) {
       </div>
 
       <div>
-        <Label htmlFor="city">Grad</Label>
-        <Input id="city" value={local.city} onChange={(e) => setLocal({ ...local, city: e.target.value })} placeholder="npr. Beograd" />
-      </div>
-
-      <div>
-        <Label htmlFor="radius">Radijus: {local.radius} km</Label>
-        <input
-          id="radius"
-          type="range"
-          min={5}
-          max={200}
-          step={5}
-          value={local.radius}
-          onChange={(e) => setLocal({ ...local, radius: Number(e.target.value) })}
-          className="mt-2 w-full accent-primary-800"
+        <Label htmlFor="city">Grad / mesto</Label>
+        <Select
+          id="city"
+          value={local.city}
+          options={CITY_OPTIONS}
+          onValueChange={applyCity}
+          className="mt-1"
         />
       </div>
+
+      {!local.city && (
+        <div>
+          <Label htmlFor="radius">Radijus: {local.radius} km</Label>
+          <input
+            id="radius"
+            type="range"
+            min={5}
+            max={200}
+            step={5}
+            value={local.radius}
+            onChange={(e) => setLocal({ ...local, radius: Number(e.target.value) })}
+            className="mt-2 w-full accent-primary-800"
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>

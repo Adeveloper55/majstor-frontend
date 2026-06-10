@@ -20,7 +20,6 @@ export default function AdminDashboardPage() {
     { label: "Zahtevi (tokeni)", key: "pendingTokenRequests", color: "bg-amber-500" },
     { label: "Zahtevi (poslovi)", key: "pendingJobApplications", color: "bg-orange-500" },
     { label: "Registracije preduzeća", key: "pendingCompanyRegistrations", color: "bg-teal-500" },
-    { label: "Prihod (RSD)", key: "totalRevenue", color: "bg-emerald-500" },
   ];
 
   const maxVal = Math.max(...stats.map((s) => Number(data?.[s.key] ?? 0)), 1);

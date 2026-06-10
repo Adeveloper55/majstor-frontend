@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { JOB_STATUS_LABELS } from "@/constants";
+import { hasJobMapLocation } from "@/lib/jobLocation";
 
 export default function AssignedJobsPage() {
   const { data: jobs, isLoading } = useAssignedJobs();
@@ -52,7 +53,7 @@ export default function AssignedJobsPage() {
                           </a>
                         </p>
                       )}
-                      {(job.clientContact.address || job.address) && (
+                      {hasJobMapLocation(job) && (job.clientContact.address || job.address) && (
                         <p><strong>Adresa:</strong> {job.address || job.clientContact.address}{job.city ? `, ${job.city}` : ""}</p>
                       )}
                     </div>

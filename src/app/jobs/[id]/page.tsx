@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_ICONS, JOB_STATUS_LABELS, CLIENT_JOB_APPROVAL_LABELS } from "@/constants";
+import { JobLocationMap } from "@/components/maps/JobLocationMap";
+import { getJobMapCoordinates, hasJobMapLocation } from "@/lib/jobLocation";
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -71,6 +73,13 @@ export default function JobDetailPage() {
   }
 
   const icon = CATEGORY_ICONS[job.category?.slug || ""] || "🔨";
+  const showMapLocation = hasJobMapLocation(job);
+  const mapCoords = getJobMapCoordinates(job);
+  const isHandyman = role === "ROLE_HANDYMAN";
+  const isAssignedHandyman = isHandyman
+    && job.selectedHandymanId === user?.id
+    && (job.status === "IN_PROGRESS" || job.status === "COMPLETED");
+  const locationLabel = [showMapLocation && job.address, job.city].filter(Boolean).join(", ");
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
@@ -103,11 +112,19 @@ export default function JobDetailPage() {
 
             <div className="grid gap-3 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-2">
               <p><strong>Grad:</strong> {job.city || "—"}</p>
-              {job.address && <p><strong>Adresa:</strong> {job.address}</p>}
+              {(!isHandyman || isAssignedHandyman) && showMapLocation && job.address && (
+                <p><strong>Adresa:</strong> {job.address}</p>
+              )}
               {role !== "ROLE_CLIENT" && job.tokenCost != null && (
                 <p><strong>Tokeni:</strong> {job.tokenCost}</p>
               )}
             </div>
+
+            {isHandyman && job.status === "OPEN" && !isAssignedHandyman && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                Tačna lokacija na mapi biće vidljiva tek kada vam admin dodeli posao.
+              </div>
+            )}
 
             {role === "ROLE_CLIENT" && job.status === "PENDING_APPROVAL" && (
               <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
@@ -154,7 +171,7 @@ export default function JobDetailPage() {
               </div>
             )}
 
-            {job.clientContact && role === "ROLE_HANDYMAN" && job.selectedHandymanId === user?.id && (
+            {job.clientContact && isAssignedHandyman && (
               <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4">
                 <h3 className="mb-3 font-bold text-green-900">Kontakt klijenta — možete krenuti sa radom</h3>
                 <div className="grid gap-2 text-sm sm:grid-cols-2">
@@ -171,8 +188,27 @@ export default function JobDetailPage() {
                       </a>
                     </p>
                   )}
-                  {(job.address || job.clientContact.address) && (
-                    <p><strong>Lokacija:</strong> {[job.address || job.clientContact.address, job.city].filter(Boolean).join(", ")}</p>
+                </div>
+                <div className="mt-4 border-t border-green-200 pt-4">
+                  <p className="text-sm font-semibold text-green-900">Lokacija</p>
+                  <p className="mt-1 text-sm text-green-800">
+                    {locationLabel || job.city || "—"}
+                  </p>
+                  {mapCoords ? (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs text-green-700">Tačka na mapi koju je klijent označio:</p>
+                      <div className="overflow-hidden rounded-xl border border-green-200 bg-white">
+                        <JobLocationMap
+                          key={`${mapCoords.latitude}-${mapCoords.longitude}`}
+                          latitude={mapCoords.latitude}
+                          longitude={mapCoords.longitude}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-green-700">
+                      Klijent nije označio tačnu tačku na mapi. Dogovorite lokaciju sa klijentom telefonom.
+                    </p>
                   )}
                 </div>
               </div>

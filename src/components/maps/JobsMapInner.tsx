@@ -1,6 +1,7 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect } from "react";
 import L from "leaflet";
 import Link from "next/link";
 import "leaflet/dist/leaflet.css";
@@ -14,13 +15,29 @@ const icon = L.icon({
   iconAnchor: [12, 41],
 });
 
-export default function JobsMapInner({ jobs }: { jobs: JobListing[] }) {
-  const centerLat = jobs.reduce((s, j) => s + (j.latitude || 0), 0) / jobs.length;
-  const centerLon = jobs.reduce((s, j) => s + (j.longitude || 0), 0) / jobs.length;
+function MapRecenter({ lat, lon, zoom }: { lat: number; lon: number; zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lon], zoom);
+  }, [lat, lon, zoom, map]);
+  return null;
+}
 
+export default function JobsMapInner({
+  jobs,
+  centerLat,
+  centerLon,
+  zoom = 11,
+}: {
+  jobs: JobListing[];
+  centerLat: number;
+  centerLon: number;
+  zoom?: number;
+}) {
   return (
-    <MapContainer center={[centerLat, centerLon]} zoom={11} className="h-80 w-full rounded-xl z-0">
-      <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <MapContainer center={[centerLat, centerLon]} zoom={zoom} className="h-80 w-full rounded-xl z-0">
+      <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <MapRecenter lat={centerLat} lon={centerLon} zoom={zoom} />
       {jobs.map((job) => (
         <Marker key={job.id} position={[job.latitude!, job.longitude!]} icon={icon}>
           <Popup>

@@ -152,13 +152,15 @@ export function MobileSiteNav({
       </Link>
 
       <div className="space-y-2 p-4">
-        <Link
-          href="/registracija-preduzeca"
-          className={cn(buttonVariants(), "w-full bg-brand-600 hover:bg-brand-700")}
-          onClick={onNavigate}
-        >
-          Da li ste izvođač?
-        </Link>
+        {!isLoggedIn && (
+          <Link
+            href="/registracija-preduzeca"
+            className={cn(buttonVariants(), "w-full bg-brand-600 hover:bg-brand-700")}
+            onClick={onNavigate}
+          >
+            Da li ste izvođač?
+          </Link>
+        )}
 
         {isLoggedIn ? (
           <>

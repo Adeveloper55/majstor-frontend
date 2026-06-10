@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -13,37 +13,73 @@ const icon = L.icon({
   iconAnchor: [12, 41],
 });
 
-function DraggableMarker({ lat, lon, onChange }: { lat: number; lon: number; onChange: (lat: number, lon: number) => void }) {
-  const map = useMapEvents({
+function DraggableMarker({
+  lat,
+  lon,
+  onChange,
+}: {
+  lat: number;
+  lon: number;
+  onChange: (lat: number, lon: number) => void;
+}) {
+  const [position, setPosition] = useState<[number, number]>([lat, lon]);
+
+  useEffect(() => {
+    setPosition([lat, lon]);
+  }, [lat, lon]);
+
+  useMapEvents({
     click(e) {
-      onChange(e.latlng.lat, e.latlng.lng);
-      map.flyTo(e.latlng, map.getZoom());
+      const next: [number, number] = [e.latlng.lat, e.latlng.lng];
+      setPosition(next);
+      onChange(next[0], next[1]);
     },
   });
 
-  useEffect(() => {
-    map.setView([lat, lon], map.getZoom() || 13);
-  }, [lat, lon, map]);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => map.invalidateSize(), 100);
-    return () => window.clearTimeout(timer);
-  }, [map]);
-
   return (
     <Marker
-      position={[lat, lon]}
+      position={position}
       icon={icon}
       draggable
-      eventHandlers={{ dragend: (e) => onChange(e.target.getLatLng().lat, e.target.getLatLng().lng) }}
+      eventHandlers={{
+        drag(e) {
+          const ll = e.target.getLatLng();
+          setPosition([ll.lat, ll.lng]);
+        },
+        dragend(e) {
+          const ll = e.target.getLatLng();
+          const next: [number, number] = [ll.lat, ll.lng];
+          setPosition(next);
+          onChange(next[0], next[1]);
+        },
+      }}
     />
   );
 }
 
-export default function LocationPickerMap({ lat, lon, onChange }: { lat: number; lon: number; onChange: (lat: number, lon: number) => void }) {
+function MapReady({ lat, lon }: { lat: number; lon: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lon], map.getZoom() || 13);
+    const timer = window.setTimeout(() => map.invalidateSize(), 150);
+    return () => window.clearTimeout(timer);
+  }, [lat, lon, map]);
+  return null;
+}
+
+export default function LocationPickerMap({
+  lat,
+  lon,
+  onChange,
+}: {
+  lat: number;
+  lon: number;
+  onChange: (lat: number, lon: number) => void;
+}) {
   return (
     <MapContainer center={[lat, lon]} zoom={13} className="h-64 w-full rounded-lg z-0">
-      <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <MapReady lat={lat} lon={lon} />
       <DraggableMarker lat={lat} lon={lon} onChange={onChange} />
     </MapContainer>
   );

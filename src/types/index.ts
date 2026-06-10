@@ -71,6 +71,7 @@ export interface JobListing {
   city?: string;
   latitude?: number;
   longitude?: number;
+  locationPinned?: boolean;
   images?: string[];
   aiScore: number;
   tokenCost?: number | null;
