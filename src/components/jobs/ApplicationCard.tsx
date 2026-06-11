@@ -1,19 +1,18 @@
 "use client";
 
 import { StarRating } from "@/components/shared/StarRating";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { JobApplication } from "@/types";
+import { APPLICATION_STATUS_LABELS } from "@/constants";
 
 interface ApplicationCardProps {
   application: JobApplication & { handyman?: { id?: string; fullName?: string; city?: string; averageRating?: number } };
-  onSelect?: (handymanId: string) => void;
   statusLabel?: string;
-  loading?: boolean;
 }
 
-export function ApplicationCard({ application, onSelect, statusLabel, loading }: ApplicationCardProps) {
+export function ApplicationCard({ application, statusLabel }: ApplicationCardProps) {
   const handyman = application.handyman as { id?: string; fullName?: string; city?: string; averageRating?: number; profileImageUrl?: string } | undefined;
+  const isUnlocked = application.status === "UNLOCKED" || application.status === "ACCEPTED";
 
   return (
     <Card>
@@ -34,22 +33,15 @@ export function ApplicationCard({ application, onSelect, statusLabel, loading }:
           <StarRating value={Math.round(handyman?.averageRating || 0)} readonly size="sm" />
         </div>
         {application.coverMessage && <p className="mb-3 text-base text-slate-700">{application.coverMessage}</p>}
-        <p className="text-sm text-slate-500">Prijavljeno: {new Date(application.appliedAt).toLocaleString("sr")}</p>
-        {application.status === "PENDING" && onSelect && handyman?.id && (
-          <Button className="mt-4" disabled={loading} onClick={() => onSelect(handyman.id!)}>
-            Izaberi ovog majstora
-          </Button>
+        <p className="text-sm text-slate-500">
+          {isUnlocked ? "Otključano" : "Prijavljeno"}: {new Date(application.appliedAt).toLocaleString("sr")}
+        </p>
+        {isUnlocked && application.tokensSpent > 0 && (
+          <p className="mt-2 text-sm font-medium text-green-800">Plaćeno: {application.tokensSpent} tokena</p>
         )}
-        {application.status === "PENDING" && !onSelect && (
-          <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
-            Čeka admin odobrenje
-          </p>
-        )}
-        {application.status !== "PENDING" && (
-          <p className="mt-3 font-semibold text-slate-700">
-            Status: {statusLabel || application.status}
-          </p>
-        )}
+        <p className="mt-3 font-semibold text-slate-700">
+          {statusLabel || APPLICATION_STATUS_LABELS[application.status] || application.status}
+        </p>
       </CardContent>
     </Card>
   );

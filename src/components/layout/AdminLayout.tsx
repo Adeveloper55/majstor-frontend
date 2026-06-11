@@ -1,16 +1,20 @@
 "use client";
 
 import { AdminSidebar } from "./AdminSidebar";
+import { cn } from "@/lib/utils";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
+export function AdminLayout({ children, className }: AdminLayoutProps) {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col md:flex-row">
+    <div className="flex min-h-0 w-full flex-1 flex-col md:flex-row">
       <AdminSidebar />
-      <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
+      <div className={cn("min-w-0 flex-1 pb-[3.5rem] md:pb-0", className)}>
+        {children}
+      </div>
     </div>
   );
 }

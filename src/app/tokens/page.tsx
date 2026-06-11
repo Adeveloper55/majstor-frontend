@@ -1,6 +1,6 @@
 "use client";
 
-import { Sidebar } from "@/components/layout/Sidebar";
+import { PanelLayout } from "@/components/layout/PanelLayout";
 import { TokenBalance } from "@/components/tokens/TokenBalance";
 import { Badge } from "@/components/ui/badge";
 import { useTokenInfo, useTokenRequests } from "@/hooks/useTokens";
@@ -11,9 +11,8 @@ export default function TokensPage() {
   const { data: requests } = useTokenRequests();
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <Sidebar />
-      <main className="flex-1 p-6">
+    <PanelLayout>
+      <main className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">Tokeni</h1>
         <TokenBalance balance={info?.tokenBalance ?? 0} transactions={info?.transactions} />
         <h2 className="mb-3 mt-8 text-lg font-bold">Zahtevi za tokene</h2>
@@ -32,6 +31,6 @@ export default function TokensPage() {
           {!requests?.length && <p className="text-slate-500">Nemate poslatih zahteva.</p>}
         </div>
       </main>
-    </div>
+    </PanelLayout>
   );
 }

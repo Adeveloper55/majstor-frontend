@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,26 +12,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LocationPicker } from "@/components/maps/LocationPicker";
 import { JobImageUpload } from "@/components/jobs/JobImageUpload";
 import { CATEGORY_ICONS } from "@/constants";
-
-const DEFAULT_LAT = 43.3209;
-const DEFAULT_LON = 21.8958;
+import { SERBIAN_CITIES } from "@/constants/serbianCities";
 
 const schema = z.object({
   categoryId: z.number({ message: "Izaberite kategoriju" }),
   title: z.string().min(3, "Naslov mora imati bar 3 karaktera"),
   description: z.string().min(10, "Opis mora imati bar 10 karaktera"),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  city: z.string().min(1, "Izaberite grad"),
   images: z.array(z.string()).optional(),
 });
 
 type FormData = z.infer<typeof schema>;
+
+const CITY_OPTIONS = SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name }));
 
 export function JobForm() {
   const router = useRouter();
@@ -40,43 +37,25 @@ export function JobForm() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [stepBusy, setStepBusy] = useState(false);
-  const [locationPinned, setLocationPinned] = useState(false);
-  const savedLocationRef = useRef<{ lat?: number; lon?: number }>({});
   const [error, setError] = useState("");
 
   const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { images: [], latitude: undefined, longitude: undefined },
+    defaultValues: { images: [], city: "" },
   });
 
   const values = watch();
   const selectedCategory = categories?.find((c: { id: number }) => c.id === values.categoryId);
 
   const onSubmit = async (data: FormData) => {
-    if (!data.city?.trim()) {
-      setError("Unesite grad pre objavljivanja.");
-      setStep(3);
-      return;
-    }
-    if (!locationPinned || savedLocationRef.current.lat == null || savedLocationRef.current.lon == null) {
-      setError("Kliknite ili prevucite pin na mapi da označite tačnu lokaciju posla.");
-      setStep(3);
-      return;
-    }
     setError("");
     setSubmitting(true);
     try {
-      const lat = savedLocationRef.current.lat;
-      const lon = savedLocationRef.current.lon;
       const payload = {
         categoryId: data.categoryId,
         title: data.title.trim(),
         description: data.description.trim(),
-        address: data.address?.trim() || undefined,
-        city: data.city?.trim() || undefined,
-        locationPinned: true,
-        latitude: lat,
-        longitude: lon,
+        city: data.city.trim(),
         images: data.images?.length ? data.images : undefined,
       };
       const res = await api.post("/api/jobs", payload);
@@ -106,7 +85,7 @@ export function JobForm() {
       return;
     }
     setStep(3);
-    setError("Unesite grad i lokaciju pre objavljivanja.");
+    setError("Izaberite grad pre objavljivanja.");
   };
 
   const nextStep = async () => {
@@ -186,29 +165,22 @@ export function JobForm() {
 
           {step === 3 && (
             <>
-              <LocationPicker
-                key="job-location-picker"
-                address={values.address || ""}
-                city={values.city || ""}
-                latitude={values.latitude ?? DEFAULT_LAT}
-                longitude={values.longitude ?? DEFAULT_LON}
-                locationPinned={locationPinned}
-                onAddressChange={(v) => setValue("address", v, { shouldDirty: true })}
-                onCityChange={(v) => setValue("city", v, { shouldDirty: true })}
-                onLocationChange={(lat, lon) => {
-                  savedLocationRef.current = { lat, lon };
-                  setValue("latitude", lat, { shouldDirty: true, shouldValidate: true });
-                  setValue("longitude", lon, { shouldDirty: true, shouldValidate: true });
-                  setLocationPinned(true);
-                }}
-              />
+              <div>
+                <Label>Grad</Label>
+                <Select
+                  options={CITY_OPTIONS}
+                  value={values.city || ""}
+                  onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
+                />
+                {errors.city && <p className="text-sm text-red-600">{errors.city.message}</p>}
+              </div>
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
                 <p className="font-semibold text-slate-900">Pregled</p>
                 <p className="mt-2"><strong>Kategorija:</strong> {selectedCategory?.name || "—"}</p>
                 <p><strong>Naslov:</strong> {values.title || "—"}</p>
                 <p><strong>Grad:</strong> {values.city || "—"}</p>
                 <p className="mt-2 text-slate-600">
-                  Nakon slanja, admin pregleda oglas pre objavljivanja majstorima.
+                  Oglas ide adminu na pregled. Biće vidljiv majstorima i izvođačima tek kada admin odobri oglas i postavi cenu u tokenima.
                 </p>
               </div>
             </>

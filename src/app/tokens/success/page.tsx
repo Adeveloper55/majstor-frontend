@@ -12,7 +12,7 @@ export default function TokenSuccessPage() {
           <CardHeader><CardTitle>Zahtev poslat!</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              Vaš zahtev za tokene je poslat. Admin će proveriti uplatu i odobriti tokene na vaš nalog.
+              Zahtev je poslat adminu. Potvrda stiže na vaš email. Predračun sa IPS QR kodom admin šalje ručno — stiže na isti email kada admin klikne „Pošalji predračun”. Tokeni se dodaju kada admin potvrdi uplatu.
             </p>
             <Link href="/tokens"><Button>Povratak na tokene</Button></Link>
           </CardContent>

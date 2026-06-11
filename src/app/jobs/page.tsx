@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useJobs, type JobFiltersState } from "@/hooks/useJobs";
 import { useCategories } from "@/hooks/useJobs";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { PanelLayout } from "@/components/layout/PanelLayout";
 import { JobFilters } from "@/components/jobs/JobFilters";
 import { JobList } from "@/components/jobs/JobList";
 import { Button } from "@/components/ui/button";
@@ -38,17 +38,21 @@ export default function JobsPage() {
   if (!role || (!isHandyman && !token)) return <p className="p-6">Učitavanje...</p>;
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <Sidebar />
-      <main className="flex flex-1 flex-col gap-6 p-6 lg:flex-row">
+    <PanelLayout>
+      <main className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:flex-row">
         {isHandyman && visibleCategories && visibleCategories.length > 0 && (
           <JobFilters categories={visibleCategories} filters={filters} onChange={setFilters} />
         )}
         <div className="flex-1">
-          <div className="mb-6 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">{isHandyman ? "Dostupni poslovi" : "Moji poslovi"}</h1>
-            {!isHandyman && (
-              <Link href="/jobs/new"><Button>Novi oglas</Button></Link>
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">{isHandyman ? "Dostupni poslovi" : "Moji poslovi"}</h1>
+              {!isHandyman && (
+                <Link href="/jobs/new"><Button>Novi oglas</Button></Link>
+              )}
+            </div>
+            {isHandyman && (
+              <p className="mt-1 text-sm text-slate-600">Odobreni oglasi klijenata — vidljivi majstorima i izvođačima.</p>
             )}
           </div>
           {needsCategories ? (
@@ -69,6 +73,6 @@ export default function JobsPage() {
           )}
         </div>
       </main>
-    </div>
+    </PanelLayout>
   );
 }

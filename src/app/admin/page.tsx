@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AdminDashboardPage() {
@@ -16,18 +16,16 @@ export default function AdminDashboardPage() {
     { label: "Majstori", key: "totalHandymen", color: "bg-indigo-500" },
     { label: "Poslovi", key: "totalJobs", color: "bg-purple-500" },
     { label: "Otvoreni", key: "openJobs", color: "bg-green-500" },
-    { label: "Poslovi na čekanju", key: "pendingJobApprovals", color: "bg-yellow-500" },
+    { label: "Na čekanju", key: "pendingJobs", color: "bg-orange-500" },
+    { label: "Kupljeni leadovi", key: "unlockedLeads", color: "bg-emerald-500" },
     { label: "Zahtevi (tokeni)", key: "pendingTokenRequests", color: "bg-amber-500" },
-    { label: "Zahtevi (poslovi)", key: "pendingJobApplications", color: "bg-orange-500" },
     { label: "Registracije preduzeća", key: "pendingCompanyRegistrations", color: "bg-teal-500" },
   ];
 
   const maxVal = Math.max(...stats.map((s) => Number(data?.[s.key] ?? 0)), 1);
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">Admin Dashboard</h1>
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           {stats.map((s) => (
@@ -56,7 +54,6 @@ export default function AdminDashboardPage() {
             })}
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

@@ -4,18 +4,18 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { useJob, useCategories } from "@/hooks/useJobs";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { LocationPicker } from "@/components/maps/LocationPicker";
+import { PanelLayout } from "@/components/layout/PanelLayout";
 import { JobImageUpload } from "@/components/jobs/JobImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_ICONS } from "@/constants";
+import { SERBIAN_CITIES } from "@/constants/serbianCities";
 
-const DEFAULT_LAT = 43.3209;
-const DEFAULT_LON = 21.8958;
+const CITY_OPTIONS = SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name }));
 
 export default function EditJobPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,11 +26,7 @@ export default function EditJobPage() {
     categoryId: 0,
     title: "",
     description: "",
-    address: "",
     city: "",
-    latitude: undefined as number | undefined,
-    longitude: undefined as number | undefined,
-    locationPinned: false,
     images: [] as string[],
   });
   const [error, setError] = useState("");
@@ -42,11 +38,7 @@ export default function EditJobPage() {
         categoryId: job.categoryId,
         title: job.title,
         description: job.description,
-        address: job.address || "",
         city: job.city || "",
-        latitude: job.latitude,
-        longitude: job.longitude,
-        locationPinned: Boolean(job.locationPinned),
         images: job.images || [],
       });
     }
@@ -54,8 +46,8 @@ export default function EditJobPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.locationPinned || form.latitude == null || form.longitude == null) {
-      setError("Prevucite pin na mapi da sačuvate lokaciju.");
+    if (!form.city.trim()) {
+      setError("Izaberite grad.");
       return;
     }
     setLoading(true);
@@ -65,11 +57,7 @@ export default function EditJobPage() {
         categoryId: form.categoryId,
         title: form.title,
         description: form.description,
-        address: form.address || undefined,
-        city: form.city || undefined,
-        locationPinned: form.locationPinned,
-        latitude: form.locationPinned ? form.latitude : undefined,
-        longitude: form.locationPinned ? form.longitude : undefined,
+        city: form.city.trim(),
         images: form.images.length ? form.images : undefined,
       });
       router.push(`/jobs/${id}`);
@@ -83,16 +71,12 @@ export default function EditJobPage() {
 
   if (!job) return <p className="p-8">Učitavanje...</p>;
   if (job.status !== "OPEN" && job.status !== "PENDING_APPROVAL") {
-    return <p className="p-8">Samo poslovi na čekanju ili odobreni oglasi mogu biti izmenjeni.</p>;
-  }
-  if (job.selectedHandymanId) {
-    return <p className="p-8">Ne možete menjati posao kojem je dodeljen majstor.</p>;
+    return <p className="p-8">Samo aktivni oglasi mogu biti izmenjeni.</p>;
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <Sidebar />
-      <main className="flex-1 p-6">
+    <PanelLayout>
+      <main className="p-4 sm:p-6">
         <Card className="mx-auto max-w-2xl">
           <CardHeader><CardTitle>Izmena oglasa</CardTitle></CardHeader>
           <CardContent>
@@ -120,19 +104,14 @@ export default function EditJobPage() {
                 images={form.images}
                 onChange={(images) => setForm({ ...form, images })}
               />
-              <LocationPicker
-                address={form.address}
-                city={form.city}
-                latitude={form.latitude ?? DEFAULT_LAT}
-                longitude={form.longitude ?? DEFAULT_LON}
-                locationPinned={form.locationPinned}
-                onAddressChange={(v) => setForm({ ...form, address: v })}
-                onCityChange={(v) => setForm({ ...form, city: v })}
-                onLocationChange={(lat, lon) => setForm({ ...form, latitude: lat, longitude: lon, locationPinned: true })}
-              />
-              {form.locationPinned && form.latitude != null && form.longitude != null && (
-                <p className="text-sm text-green-700">Lokacija je označena na mapi.</p>
-              )}
+              <div>
+                <Label>Grad</Label>
+                <Select
+                  options={CITY_OPTIONS}
+                  value={form.city}
+                  onValueChange={(v) => setForm({ ...form, city: v })}
+                />
+              </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
               <div className="flex gap-3">
                 <Button type="submit" disabled={loading}>{loading ? "Čuvanje..." : "Sačuvaj izmene"}</Button>
@@ -142,6 +121,6 @@ export default function EditJobPage() {
           </CardContent>
         </Card>
       </main>
-    </div>
+    </PanelLayout>
   );
 }

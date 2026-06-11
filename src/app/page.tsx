@@ -28,15 +28,15 @@ const popularCategories = [
 const steps = [
   {
     title: "Objavite posao",
-    desc: "Klijent opiše posao i oglas odmah postaje vidljiv majstorima.",
+    desc: "Klijent opiše posao; admin odobri i oglas postaje vidljiv majstorima i izvođačima.",
   },
   {
-    title: "Majstori se prijave",
-    desc: "Verifikovani majstori se besplatno prijave na posao.",
+    title: "Majstori i izvođači kupuju kontakt",
+    desc: "Registrovani majstori i izvođači vide oglase i plaćaju tokene za kontakt klijenta.",
   },
   {
-    title: "Admin dodeli majstora",
-    desc: "Admin pregleda prijave i dodeljuje najboljeg majstora za posao.",
+    title: "Dogovor i posao",
+    desc: "Kontakt ide direktno — klijent i majstor/izvođač dogovaraju detalje.",
   },
 ];
 

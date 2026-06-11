@@ -10,9 +10,8 @@ const links = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Klijenti" },
   { href: "/admin/handymen", label: "Majstori" },
-  { href: "/admin/jobs", label: "Poslovi" },
   { href: "/admin/pending-jobs", label: "Poslovi na čekanju" },
-  { href: "/admin/job-requests", label: "Zahtevi za posao" },
+  { href: "/admin/jobs", label: "Poslovi" },
   { href: "/admin/token-requests", label: "Zahtevi za tokene" },
   { href: "/admin/company-registrations", label: "Registracije preduzeća" },
   { href: "/admin/contact", label: "Kontakt poruke" },
@@ -103,7 +102,7 @@ export function AdminSidebar() {
         </div>
       )}
 
-      <aside className="hidden w-56 shrink-0 border-r bg-gray-900 p-4 text-white md:block">
+      <aside className="hidden w-56 shrink-0 border-r border-slate-800 bg-gray-900 p-4 text-white md:block">
         <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Admin panel</p>
         <AdminNavLinks pathname={pathname} />
       </aside>

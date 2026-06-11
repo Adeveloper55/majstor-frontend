@@ -17,6 +17,8 @@ export default function AdminHandymanDetailPage() {
   const [amount, setAmount] = useState(0);
   const [description, setDescription] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [adjustMessage, setAdjustMessage] = useState("");
+  const [adjustError, setAdjustError] = useState("");
 
   const { data, refetch } = useQuery({
     queryKey: ["admin-handyman", id],
@@ -24,8 +26,24 @@ export default function AdminHandymanDetailPage() {
   });
 
   const adjustTokens = async () => {
-    await api.post(`/api/admin/handymen/${id}/adjust-tokens`, { amount, description });
-    refetch();
+    setAdjustMessage("");
+    setAdjustError("");
+    if (amount < 0 && (data?.tokenBalance ?? 0) === 0) {
+      setAdjustMessage("Stanje tokena je nula.");
+      return;
+    }
+    try {
+      await api.post(`/api/admin/handymen/${id}/adjust-tokens`, { amount, description });
+      await refetch();
+      setAdjustMessage(amount === 0 ? "Nema promene." : "Tokeni su ažurirani.");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      if (msg?.toLowerCase().includes("nula")) {
+        setAdjustMessage(msg);
+      } else {
+        setAdjustError(msg || "Greška pri korekciji tokena.");
+      }
+    }
   };
 
   const deactivate = async () => {
@@ -53,6 +71,8 @@ export default function AdminHandymanDetailPage() {
           <div><Label>Količina (+/-)</Label><Input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></div>
           <div><Label>Opis</Label><Input value={description} onChange={(e) => setDescription(e.target.value)} /></div>
           <Button onClick={adjustTokens}>Primeni</Button>
+          {adjustMessage && <p className="text-sm text-amber-700">{adjustMessage}</p>}
+          {adjustError && <p className="text-sm text-red-600">{adjustError}</p>}
         </div>
         <Button variant="destructive" onClick={() => setConfirmOpen(true)}>Deaktiviraj majstora</Button>
         <ConfirmDialog

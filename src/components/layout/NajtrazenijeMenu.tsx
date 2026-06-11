@@ -36,14 +36,7 @@ function buildCategoryList(apiCategories: Category[]): NajtrazenijeItem[] {
   });
 }
 
-const FEATURED_SLUGS = [
-  "elektroinstalacije-elektricar",
-  "vodoinstalater",
-  "stolar",
-  "krecenje-moler",
-] as const;
-
-const FEATURED_CATEGORIES: { slug: (typeof FEATURED_SLUGS)[number]; icon: LucideIcon; color: string }[] = [
+const FEATURED_CATEGORIES: { slug: string; icon: LucideIcon; color: string }[] = [
   { slug: "elektroinstalacije-elektricar", icon: Zap, color: "bg-amber-100 text-amber-700" },
   { slug: "vodoinstalater", icon: Droplets, color: "bg-blue-100 text-blue-700" },
   { slug: "stolar", icon: Hammer, color: "bg-orange-100 text-orange-700" },

@@ -5,10 +5,11 @@ import api from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useCategories } from "@/hooks/useJobs";
 import { useReviewsForUser, useReviewsForHandyman } from "@/hooks/useReviews";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { PanelLayout } from "@/components/layout/PanelLayout";
 import { AvatarUpload } from "@/components/shared/AvatarUpload";
 import { CategoryPicker } from "@/components/shared/CategoryPicker";
 import { ReviewCard } from "@/components/reviews/ReviewCard";
+import { HandymanViewedJobsHistory } from "@/components/jobs/HandymanViewedJobsHistory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,9 +82,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <Sidebar />
-      <main className="flex-1 space-y-8 p-6">
+    <PanelLayout>
+      <main className="flex-1 space-y-8 p-4 sm:p-6">
         <Card className="mx-auto max-w-2xl">
           <CardHeader><CardTitle>Profil</CardTitle></CardHeader>
           <CardContent className="space-y-4">
@@ -131,6 +131,9 @@ export default function ProfilePage() {
             {saved && <p className="text-sm text-green-600">Sačuvano!</p>}
           </CardContent>
         </Card>
+        {role === "ROLE_HANDYMAN" && (
+          <HandymanViewedJobsHistory limit={10} showViewAllLink />
+        )}
         <div>
           <h2 className="mb-4 text-xl font-bold">Moje recenzije</h2>
           <div className="grid gap-3 md:grid-cols-2">
@@ -139,6 +142,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-    </div>
+    </PanelLayout>
   );
 }

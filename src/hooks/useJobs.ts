@@ -84,7 +84,7 @@ export function useMyApplications() {
 
 export function useAssignedJobs() {
   return useQuery({
-    queryKey: ["assigned-jobs"],
+    queryKey: ["unlocked-jobs"],
     queryFn: async () => (await api.get<JobListing[]>("/api/handymen/me/assigned-jobs")).data,
   });
 }

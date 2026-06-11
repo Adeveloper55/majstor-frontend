@@ -1,6 +1,9 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Majstor na klik";
 
+/** Majstori i izvođači (preduzeća) — isti panel, ista vidljivost oglasa */
+export const SERVICE_PROVIDER_AUDIENCE = "majstorima i izvođačima";
+
 export const API_PATHS = {
   auth: {
     login: "/api/auth/login",
@@ -42,26 +45,27 @@ export const SORT_OPTIONS = [
 export const JOB_SORT_OPTIONS = SORT_OPTIONS;
 
 export const JOB_STATUS_LABELS: Record<string, string> = {
-  PENDING_APPROVAL: "Na čekanju odobrenja",
-  OPEN: "Otvoren",
+  PENDING_APPROVAL: "Čeka odobrenje admina",
+  OPEN: "Aktivan — vidljiv majstorima i izvođačima",
   IN_PROGRESS: "U toku",
   COMPLETED: "Završen",
   CANCELLED: "Otkazan",
 };
 
-/** Status oglasa iz perspektive klijenta (admin odobrenje) */
+/** Status oglasa iz perspektive klijenta */
 export const CLIENT_JOB_APPROVAL_LABELS: Record<string, string> = {
-  PENDING_APPROVAL: "Nije odobren",
-  OPEN: "Odobren",
-  IN_PROGRESS: "Majstor dodeljen",
+  PENDING_APPROVAL: "Čeka odobrenje admina",
+  OPEN: "Aktivan — vidljiv majstorima i izvođačima",
+  IN_PROGRESS: "U toku",
   COMPLETED: "Završen",
   CANCELLED: "Otkazan",
 };
 
 export const APPLICATION_STATUS_LABELS: Record<string, string> = {
-  PENDING: "Na čekanju (admin)",
-  ACCEPTED: "Odobreno — dodeljeno",
-  REJECTED: "Nije odobreno",
+  UNLOCKED: "Kontakt otključan",
+  ACCEPTED: "Kontakt otključan",
+  PENDING: "Na čekanju",
+  REJECTED: "Odbijeno",
 };
 
 export const TOKEN_REQUEST_STATUS: Record<string, string> = {

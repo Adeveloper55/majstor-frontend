@@ -37,7 +37,6 @@ const SYNONYM_TO_SLUGS: Record<string, string[]> = {
   parket: ["parketari", "laminati"],
   krečenje: ["krecenje-moler"],
   ciscenje: ["agencija-za-ciscenje", "ciscenje-dimnjaka"],
-  ciscenje: ["agencija-za-ciscenje", "ciscenje-dimnjaka"],
 };
 
 interface IndexedCategory {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -11,17 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { JobApplication, JobListing } from "@/types";
-import { JOB_STATUS_LABELS } from "@/constants";
+import { APPLICATION_STATUS_LABELS, JOB_STATUS_LABELS } from "@/constants";
 
 export default function AdminJobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const qc = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [selectedHandymanId, setSelectedHandymanId] = useState("");
-  const [assigning, setAssigning] = useState(false);
-  const [assignError, setAssignError] = useState("");
-  const [tokenCost, setTokenCost] = useState("5");
+  const [tokenCost, setTokenCost] = useState("");
   const [approving, setApproving] = useState(false);
   const [approveError, setApproveError] = useState("");
 
@@ -36,28 +33,20 @@ export default function AdminJobDetailPage() {
     enabled: !!id,
   });
 
-  const assignHandyman = async (handymanId: string) => {
-    setAssigning(true);
-    setAssignError("");
-    try {
-      await api.post(`/api/admin/jobs/${id}/assign/${handymanId}`);
-      await refetch();
-      qc.invalidateQueries({ queryKey: ["admin-job-applications", id] });
-      setSelectedHandymanId("");
-    } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setAssignError(msg || "Greška pri dodeli majstora");
-    } finally {
-      setAssigning(false);
+  const unlocked = applications?.filter((a) => a.status === "UNLOCKED" || a.status === "ACCEPTED") ?? [];
+
+  useEffect(() => {
+    if (job?.tokenCost != null && job.status === "PENDING_APPROVAL") {
+      setTokenCost(String(job.tokenCost));
     }
-  };
+  }, [job?.tokenCost, job?.status]);
 
   const remove = async () => {
     await api.delete(`/api/admin/jobs/${id}`);
     router.push("/admin/jobs");
   };
 
-  const approveJob = async () => {
+  const approveLegacyJob = async () => {
     const cost = parseInt(tokenCost, 10);
     if (!cost || cost < 1) {
       setApproveError("Unesite validan broj tokena (min. 1).");
@@ -68,8 +57,9 @@ export default function AdminJobDetailPage() {
     try {
       await api.post(`/api/admin/jobs/${id}/approve`, { tokenCost: cost });
       await refetch();
-      qc.invalidateQueries({ queryKey: ["admin-pending-jobs"] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      qc.invalidateQueries({ queryKey: ["admin-jobs"] });
+      qc.invalidateQueries({ queryKey: ["admin-pending-jobs"] });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setApproveError(msg || "Greška pri odobravanju.");
@@ -91,11 +81,10 @@ export default function AdminJobDetailPage() {
         <p className="text-base text-slate-700">{job.description}</p>
         <div className="space-y-1 text-slate-600">
           <p>Grad: {job.city || "—"}</p>
-          <p>Adresa: {job.address || "—"}</p>
           <p>Kategorija: {job.category?.name}</p>
-          <p>Tokeni: {job.status === "PENDING_APPROVAL" ? "— (postavite pri odobrenju)" : job.tokenCost}</p>
+          <p>Tokeni (cena lead-a): {job.tokenCost ?? "—"}</p>
           {job.clientContact && (
-            <p>Klijent: {job.clientContact.fullName} ({job.clientContact.email})</p>
+            <p>Klijent: {job.clientContact.fullName} ({job.clientContact.email}){job.clientContact.phone ? ` • ${job.clientContact.phone}` : ""}</p>
           )}
         </div>
 
@@ -104,20 +93,15 @@ export default function AdminJobDetailPage() {
             <CardHeader><CardTitle>Odobri oglas</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-600">
-                Postavite koliko tokena košta ovaj posao za majstore. Nakon odobrenja oglas postaje vidljiv.
+                Postavite koliko tokena košta lead za ovaj posao. AI predlog: {job.tokenCost ?? "—"} tokena
+                {job.aiScore != null ? ` (ocena ${job.aiScore}/5)` : ""}.
               </p>
               <div className="flex flex-wrap items-end gap-3">
                 <div>
                   <label className="mb-1 block text-sm font-medium">Tokeni</label>
-                  <Input
-                    type="number"
-                    min={1}
-                    className="w-32"
-                    value={tokenCost}
-                    onChange={(e) => setTokenCost(e.target.value)}
-                  />
+                  <Input type="number" min={1} className="w-32" value={tokenCost} onChange={(e) => setTokenCost(e.target.value)} />
                 </div>
-                <Button disabled={approving} onClick={approveJob}>
+                <Button disabled={approving} onClick={approveLegacyJob}>
                   {approving ? "Odobravanje..." : "Dozvoli posao"}
                 </Button>
               </div>
@@ -126,70 +110,30 @@ export default function AdminJobDetailPage() {
           </Card>
         )}
 
-        {job.status === "OPEN" && (
-          <Card>
-            <CardHeader><CardTitle>Odobri majstora za posao</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-slate-600">
-                Samo admin odobrava majstora. Pri dodeli posla skidaju se tokeni sa računa majstora.
-              </p>
-              {applications && applications.length > 0 && (
-                <div>
-                  <p className="mb-2 font-medium">Prijave na posao:</p>
-                  <div className="space-y-2">
-                    {applications.map((app) => (
-                      <div key={app.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3">
-                        <div>
-                          <p className="font-medium">{app.handyman?.fullName}</p>
-                          <p className="text-sm text-slate-500">{app.coverMessage || "Bez poruke"}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge>{app.status}</Badge>
-                          {job.status === "OPEN" && (
-                            <Button size="sm" disabled={assigning} onClick={() => assignHandyman(app.handyman?.id || "")}>
-                              Dodeli posao
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+        <Card>
+          <CardHeader>
+            <CardTitle>Kupljeni leadovi ({unlocked.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-slate-600">
+              Majstori koji su platili tokene i dobili kontakt klijenta. Više majstora može kupiti isti posao.
+            </p>
+            {unlocked.map((app) => (
+              <div key={app.id} className="rounded-lg border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="font-medium">{app.handyman?.fullName || "Majstor"}</p>
+                    <p className="text-sm text-slate-500">
+                      {new Date(app.appliedAt).toLocaleString("sr")} • {app.tokensSpent} tokena
+                    </p>
                   </div>
-                </div>
-              )}
-              <div>
-                <p className="mb-2 font-medium">Ručna dodela (samo ako se majstor već prijavio):</p>
-                <p className="mb-2 text-xs text-slate-500">Majstor mora prvo da se prijavi na posao pre odobrenja.</p>
-                <div className="flex flex-wrap gap-2">
-                  <select
-                    className="min-w-[240px] rounded-lg border-2 border-slate-200 px-3 py-2"
-                    value={selectedHandymanId}
-                    onChange={(e) => setSelectedHandymanId(e.target.value)}
-                  >
-                    <option value="">— Majstor sa prijavom —</option>
-                    {applications?.filter((a) => a.status === "PENDING").map((a) => (
-                      <option key={a.id} value={a.handyman?.id}>{a.handyman?.fullName}</option>
-                    ))}
-                  </select>
-                  <Button
-                    disabled={!selectedHandymanId || assigning}
-                    onClick={() => assignHandyman(selectedHandymanId)}
-                  >
-                    {assigning ? "Dodela..." : "Dodeli posao"}
-                  </Button>
+                  <Badge variant="success">{APPLICATION_STATUS_LABELS[app.status] || app.status}</Badge>
                 </div>
               </div>
-              {assignError && <p className="text-sm text-red-600">{assignError}</p>}
-            </CardContent>
-          </Card>
-        )}
-
-        {job.status === "IN_PROGRESS" && job.selectedHandymanId && (
-          <Card className="border-green-200 bg-green-50">
-            <CardContent className="p-4">
-              <p className="font-medium text-green-900">Posao je dodeljen majstoru (ID: {job.selectedHandymanId})</p>
-            </CardContent>
-          </Card>
-        )}
+            ))}
+            {!unlocked.length && <p className="text-slate-500">Još niko nije otključao kontakt za ovaj posao.</p>}
+          </CardContent>
+        </Card>
 
         <Button variant="destructive" onClick={() => setConfirmOpen(true)}>Ukloni oglas</Button>
         <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} title="Ukloniti oglas?" confirmLabel="Ukloni" onConfirm={remove} />

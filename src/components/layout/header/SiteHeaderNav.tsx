@@ -14,6 +14,8 @@ interface SiteHeaderNavProps {
   panelHref?: string;
   userLabel?: string;
   onLogout?: () => void;
+  /** Kompaktan header na panel/admin stranicama — bez mega menija */
+  compact?: boolean;
 }
 
 type OpenMenu = "nadji" | "alati" | null;
@@ -23,6 +25,7 @@ export function SiteHeaderNav({
   panelHref = "/dashboard",
   userLabel,
   onLogout,
+  compact = false,
 }: SiteHeaderNavProps) {
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -61,7 +64,8 @@ export function SiteHeaderNav({
             <span className="hidden sm:inline">Majstor na klik</span>
           </Link>
 
-          {/* Nađi majstore, Alati, Da li ste izvođač? */}
+          {/* Nađi majstore, Alati — sakriveno u kompaktnom panel modu */}
+          {!compact && (
           <nav
             className="hidden min-w-0 flex-1 items-center gap-1 md:flex"
             aria-label="Glavna navigacija"
@@ -90,6 +94,9 @@ export function SiteHeaderNav({
               </Link>
             )}
           </nav>
+          )}
+
+          {compact && <div className="hidden flex-1 md:block" aria-hidden />}
 
           {/* Desna strana — auth ili korisnički panel */}
           {!isLoggedIn ? (
@@ -123,7 +130,18 @@ export function SiteHeaderNav({
             </div>
           )}
 
-          {/* Mobile hamburger */}
+          {compact && isLoggedIn && onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }), "ml-auto md:hidden")}
+            >
+              Odjava
+            </button>
+          )}
+
+          {/* Mobile hamburger — samo na javnim stranicama */}
+          {!compact && (
           <button
             type="button"
             className="ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 md:hidden"
@@ -132,6 +150,7 @@ export function SiteHeaderNav({
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+          )}
         </div>
       </div>
 

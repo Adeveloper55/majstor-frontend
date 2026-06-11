@@ -16,10 +16,11 @@ export function BankDetailsCard({ bank }: { bank: BankDetails }) {
   };
 
   const rows = [
-    { key: "company", label: "Firma", value: bank.companyName },
+    { key: "company", label: "Primalac", value: bank.companyName },
     ...(bank.companyPib ? [{ key: "pib", label: "PIB", value: bank.companyPib }] : []),
-    { key: "bank", label: "Banka", value: bank.bankName },
     { key: "account", label: "Račun", value: bank.bankAccount },
+    { key: "purpose", label: "Svrha uplate", value: bank.paymentPurpose },
+    { key: "reference", label: "Poziv na broj", value: bank.paymentReferenceDisplay },
   ];
 
   return (

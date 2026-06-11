@@ -81,6 +81,7 @@ export interface JobListing {
   distance?: number;
   clientContact?: ClientContact;
   assignedHandymanContact?: HandymanContact;
+  unlockedByMe?: boolean;
 }
 
 export interface JobApplication {
@@ -89,7 +90,7 @@ export interface JobApplication {
   handyman?: Partial<Handyman>;
   tokensSpent: number;
   coverMessage?: string;
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "UNLOCKED";
   appliedAt: string;
   jobTitle?: string;
   jobCity?: string;
@@ -122,6 +123,7 @@ export interface TokenPurchaseRequest {
   paymentReference?: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   adminNote?: string;
+  predracunSentAt?: string | null;
   createdAt: string;
 }
 
@@ -130,6 +132,9 @@ export interface BankDetails {
   companyPib?: string;
   bankName: string;
   bankAccount: string;
+  paymentPurpose: string;
+  paymentReference: string;
+  paymentReferenceDisplay: string;
   paymentInstructions: string;
 }
 
