@@ -1,4 +1,6 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+import { resolveApiBaseUrl } from "@/lib/apiUrl";
+
+export const API_URL = resolveApiBaseUrl();
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Majstor 365";
 
 /** Majstori i izvođači (preduzeća) — isti panel, ista vidljivost oglasa */

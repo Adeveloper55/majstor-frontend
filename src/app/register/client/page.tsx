@@ -31,8 +31,12 @@ export default function RegisterClientPage() {
       const { data } = await api.post<{ message: string; email: string }>("/api/auth/register/client", form);
       router.push(`/register/check-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg || "Greška pri registraciji");
+      const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
+      if (!axiosErr.response) {
+        setError("Server nije dostupan. Proverite internet konekciju i pokušajte ponovo.");
+      } else {
+        setError(axiosErr.response.data?.message || "Greška pri registraciji");
+      }
     } finally {
       setLoading(false);
     }

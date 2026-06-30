@@ -32,7 +32,6 @@ export default function ProfilePage() {
   });
   const [categoryIds, setCategoryIds] = useState<number[]>(handymanUser?.categoryIds ?? []);
   const [pibError, setPibError] = useState("");
-  const [categoryError, setCategoryError] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -52,16 +51,7 @@ export default function ProfilePage() {
         setPibError(pibValidation);
         return;
       }
-      if (categoryIds.length === 0) {
-        setCategoryError("Izaberite bar jednu kategoriju posla.");
-        return;
-      }
-      if (categoryIds.length > 10) {
-        setCategoryError("Možete izabrati najviše 10 kategorija.");
-        return;
-      }
       setPibError("");
-      setCategoryError("");
     }
     const url = role === "ROLE_HANDYMAN" ? "/api/handymen/me" : "/api/users/me";
     const payload =
@@ -73,7 +63,6 @@ export default function ProfilePage() {
             bio: form.bio,
             profileImageUrl: form.profileImageUrl,
             pib: normalizePib(form.pib) || undefined,
-            categoryIds,
           }
         : form;
     const { data } = await api.put(url, payload);
@@ -113,15 +102,11 @@ export default function ProfilePage() {
                     <Input value={form.companyName} disabled className="bg-slate-50" />
                   </div>
                 )}
-                {allCategories && (
+                {allCategories && categoryIds.length > 0 && (
                   <CategoryPicker
                     categories={allCategories}
                     selected={categoryIds}
-                    onChange={(ids) => {
-                      setCategoryIds(ids);
-                      if (categoryError) setCategoryError("");
-                    }}
-                    error={categoryError}
+                    readOnly
                   />
                 )}
                 <div><Label>O meni</Label><Input value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} /></div>

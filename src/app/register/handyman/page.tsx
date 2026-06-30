@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api";
+import { resolveApiBaseUrl } from "@/lib/apiUrl";
 import { validatePib, normalizePib } from "@/lib/pibValidation";
 import { isValidSerbianPhone } from "@/lib/phoneUtils";
 import { useCategories } from "@/hooks/useJobs";
@@ -16,7 +17,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterHandymanPage() {
   const router = useRouter();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+    refetch: refetchCategories,
+  } = useCategories();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "", city: "", bio: "", pib: "" });
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [pibError, setPibError] = useState("");
@@ -25,12 +31,20 @@ export default function RegisterHandymanPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const categoriesReady = Boolean(categories?.length);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setPibError("");
     setCategoryError("");
+
+    if (!categoriesReady) {
+      setError("Kategorije nisu učitane. Proverite konekciju sa serverom i pokušajte ponovo.");
+      setLoading(false);
+      return;
+    }
 
     if (form.phone.trim() && !isValidSerbianPhone(form.phone)) {
       setPhoneError("Unesite ispravan srpski mobilni broj (npr. 0641234567).");
@@ -65,8 +79,12 @@ export default function RegisterHandymanPage() {
       const { data } = await api.post<{ message: string; email: string }>("/api/auth/register/handyman", payload);
       router.push(`/register/check-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg || "Greška pri registraciji");
+      const axiosErr = err as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      if (!axiosErr.response) {
+        setError("Server nije dostupan. Proverite internet konekciju i pokušajte ponovo.");
+      } else {
+        setError(axiosErr.response.data?.message || "Greška pri registraciji");
+      }
     } finally {
       setLoading(false);
     }
@@ -111,20 +129,33 @@ export default function RegisterHandymanPage() {
             </div>
             {categoriesLoading ? (
               <p className="text-sm text-slate-500">Učitavanje kategorija...</p>
-            ) : categories ? (
-              <CategoryPicker
-                categories={categories}
-                selected={categoryIds}
-                onChange={(ids) => {
-                  setCategoryIds(ids);
-                  if (categoryError) setCategoryError("");
-                }}
-                error={categoryError}
-              />
-            ) : null}
+            ) : categoriesError || !categories?.length ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <p>Nije moguće učitati kategorije poslova.</p>
+                <p className="mt-1 text-xs text-red-600">API: {resolveApiBaseUrl()}</p>
+                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => refetchCategories()}>
+                  Pokušaj ponovo
+                </Button>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-amber-800">
+                  Kategorije birate jednom pri registraciji — naknadna izmena nije moguća.
+                </p>
+                <CategoryPicker
+                  categories={categories}
+                  selected={categoryIds}
+                  onChange={(ids) => {
+                    setCategoryIds(ids);
+                    if (categoryError) setCategoryError("");
+                  }}
+                  error={categoryError}
+                />
+              </>
+            )}
             <div><Label>O meni</Label><Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} /></div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading || categoriesLoading}>
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Registracija..." : "Registruj se"}
             </Button>
           </form>

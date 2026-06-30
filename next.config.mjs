@@ -8,7 +8,8 @@ const nextConfig = {
 
 export default withPWA({
   dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: process.env.NODE_ENV === "production",
+  // PWA service worker presreće cross-origin API pozive i lomi registraciju
+  disable: true,
+  register: false,
   fallbacks: { document: "/offline" },
 })(nextConfig);

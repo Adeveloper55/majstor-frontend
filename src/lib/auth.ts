@@ -1,10 +1,9 @@
 import axios from "axios";
+import { resolveApiBaseUrl } from "@/lib/apiUrl";
 import type { Handyman, Role, User } from "@/types";
 
 /** 7 days — matches backend refresh token lifetime */
 export const AUTH_COOKIE_MAX_AGE = 604800;
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -50,7 +49,7 @@ export async function logoutSession(): Promise<void> {
   const refreshToken = getRefreshToken();
   if (refreshToken) {
     try {
-      await axios.post(`${API_URL}/api/auth/logout`, { refreshToken });
+      await axios.post(`${resolveApiBaseUrl()}/api/auth/logout`, { refreshToken });
     } catch {
       // ignore — local session is cleared regardless
     }

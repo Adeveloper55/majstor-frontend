@@ -110,6 +110,9 @@ export function CompanyRegistrationStepServices({
 
       <hr className="border-slate-200" />
 
+      <p className="text-sm text-amber-800">
+        Delatnosti birate jednom pri prijavi — naknadna izmena nije moguća.
+      </p>
       <p className="text-sm text-slate-600">
         Kliknite na odgovarajuće ponuđene oblasti i označite radove koje obavljate:
       </p>

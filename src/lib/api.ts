@@ -1,11 +1,15 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { clearAuth, getRefreshToken } from "@/lib/auth";
+import { resolveApiBaseUrl } from "@/lib/apiUrl";
 import { useAuthStore } from "@/store/authStore";
 import type { Handyman, Role, User } from "@/types";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
-});
+const api = axios.create();
+
+function applyBaseUrl(config: InternalAxiosRequestConfig) {
+  config.baseURL = resolveApiBaseUrl();
+  return config;
+}
 
 let refreshPromise: Promise<string | null> | null = null;
 
@@ -20,7 +24,7 @@ async function refreshAccessToken(): Promise<string | null> {
         refreshToken: string;
         role: Role;
         user: User | Handyman;
-      }>(`${api.defaults.baseURL}/api/auth/refresh`, { refreshToken })
+      }>(`${resolveApiBaseUrl()}/api/auth/refresh`, { refreshToken })
       .then((res) => {
         const { token, refreshToken: newRefresh, role, user } = res.data;
         useAuthStore.getState().login(token, newRefresh, role, user);
@@ -39,6 +43,7 @@ async function refreshAccessToken(): Promise<string | null> {
 }
 
 api.interceptors.request.use((config) => {
+  applyBaseUrl(config);
   if (typeof window !== "undefined") {
     const url = config.url || "";
     const isPublicAuth =
