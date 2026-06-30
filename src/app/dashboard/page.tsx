@@ -52,7 +52,7 @@ function ClientDashboard() {
         <Card>
           <CardHeader><CardTitle>Aktivni oglasi ({activeJobs.length})</CardTitle></CardHeader>
           <CardContent>
-            <p className="mb-4 text-sm text-slate-600">Majstori i izvođači vide ove odobrene oglase i mogu da kupe kontakt. Vi ne birate ko zove.</p>
+            <p className="mb-4 text-sm text-slate-600">Majstori i izvođači vide ove odobrene oglase i mogu da pogledaju detalje (uz tokene). Ako im odgovara, sami zovu klijenta — vi ne birate ko zove.</p>
             <JobList jobs={activeJobs.slice(0, 6)} hideTokenCost emptyMessage="Nemate aktivnih oglasa." />
           </CardContent>
         </Card>

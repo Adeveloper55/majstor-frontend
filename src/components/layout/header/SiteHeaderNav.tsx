@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { NadjiMajstoreMenu } from "./NadjiMajstoreMenu";
 import { AlatiMenu } from "./AlatiMenu";
 import { MobileSiteNav } from "./MobileSiteNav";
+import { APP_NAME } from "@/constants";
 
 interface SiteHeaderNavProps {
   isLoggedIn?: boolean;
@@ -61,7 +62,7 @@ export function SiteHeaderNav({
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-800 text-white">
               <Wrench className="h-5 w-5" />
             </span>
-            <span className="hidden sm:inline">Majstor na klik</span>
+            <span className="hidden sm:inline">{APP_NAME}</span>
           </Link>
 
           {/* Nađi majstore, Alati — sakriveno u kompaktnom panel modu */}

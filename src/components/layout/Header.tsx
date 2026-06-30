@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import type { Handyman } from "@/types";
+import { APP_NAME } from "@/constants";
 
 export function Header() {
   const { role, user, logout } = useAuthStore();
@@ -22,7 +23,7 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <div className="flex min-w-0 items-center gap-4">
           <Link href="/" className="shrink-0 text-lg font-bold text-primary-800" title="Početna strana">
-            Majstor na klik
+            {APP_NAME}
           </Link>
           <Link href="/" className="hidden text-sm font-medium text-slate-600 hover:text-primary-800 sm:inline">
             Početna

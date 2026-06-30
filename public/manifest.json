@@ -1,6 +1,6 @@
 {
-  "name": "Majstor na klik",
-  "short_name": "Majstor",
+  "name": "Majstor 365",
+  "short_name": "Majstor 365",
   "description": "Platforma za povezivanje klijenata i majstora",
   "start_url": "/",
   "display": "standalone",

@@ -41,7 +41,7 @@ export default function JobDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ["unlocked-jobs"] });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg || "Greška pri otključavanju kontakta");
+      setError(msg || "Greška pri pregledu detalja");
     } finally {
       setUnlocking(false);
     }
@@ -85,7 +85,7 @@ export default function JobDetailPage() {
                 {statusLabel}
               </Badge>
               {hasUnlocked && isHandyman && (
-                <Badge variant="success">Kontakt otključan</Badge>
+                <Badge variant="success">Detalji pregledani</Badge>
               )}
             </div>
             <CardTitle className="mt-3 text-2xl">{job.title}</CardTitle>
@@ -114,7 +114,7 @@ export default function JobDetailPage() {
               <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
                 <p className="font-semibold">Oglas još nije vidljiv majstorima i izvođačima</p>
                 <p className="mt-1">
-                  Admin mora da pregleda oglas, upiše koliko tokena košta lead i klikne „Dozvoli posao”.
+                  Admin mora da pregleda oglas, upiše koliko tokena košta pregled detalja i klikne „Dozvoli posao”.
                   Tek tada oglas postaje aktivan i vidljiv svim majstorima i izvođačima u platformi.
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function JobDetailPage() {
             {role === "ROLE_CLIENT" && job.status === "OPEN" && (
               <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4 text-sm text-green-900">
                 <p className="font-semibold">Oglas je aktivan</p>
-                <p className="mt-1">Majstori i izvođači vide oglas i mogu da kupe vaš kontakt. Vi ne birate ko zove — svi zainteresovani dobijaju telefon.</p>
+                <p className="mt-1">Majstori i izvođači vide oglas i mogu da pogledaju detalje (uz tokene). Ako im odgovara, sami zovu — vi ne birate ko zove.</p>
               </div>
             )}
 
@@ -161,15 +161,15 @@ export default function JobDetailPage() {
 
             {isHandyman && job.status === "OPEN" && !hasUnlocked && (
               <div className="space-y-3 border-t pt-5">
-                <h3 className="font-semibold">Vidi detalje i kontakt</h3>
+                <h3 className="font-semibold">Vidi detalje</h3>
                 <p className="text-sm text-slate-600">
-                  Klikom otključavate kontakt klijenta (telefon i grad). Skinuće se {job.tokenCost} tokena sa vašeg naloga.
-                  Više majstora može da kupi isti posao.
+                  Klikom vidite detalje posla i kontakt klijenta (telefon i grad). Skinuće se {job.tokenCost} tokena sa vašeg naloga.
+                  Nakon toga sami odlučujete da li ćete pozvati klijenta. Više majstora može da pogleda isti oglas.
                 </p>
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 <div className="flex flex-wrap gap-3">
                   <Button onClick={handleUnlock} disabled={unlocking}>
-                    {unlocking ? "Otključavanje..." : `Vidi detalje (${job.tokenCost} tokena)`}
+                    {unlocking ? "Učitavanje..." : `Vidi detalje (${job.tokenCost} tokena)`}
                   </Button>
                   <Link href="/tokens"><Button variant="outline">Dopuni tokene</Button></Link>
                 </div>

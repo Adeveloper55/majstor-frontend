@@ -1,5 +1,5 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Majstor na klik";
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Majstor 365";
 
 /** Majstori i izvođači (preduzeća) — isti panel, ista vidljivost oglasa */
 export const SERVICE_PROVIDER_AUDIENCE = "majstorima i izvođačima";
@@ -62,8 +62,8 @@ export const CLIENT_JOB_APPROVAL_LABELS: Record<string, string> = {
 };
 
 export const APPLICATION_STATUS_LABELS: Record<string, string> = {
-  UNLOCKED: "Kontakt otključan",
-  ACCEPTED: "Kontakt otključan",
+  UNLOCKED: "Detalji pregledani",
+  ACCEPTED: "Detalji pregledani",
   PENDING: "Na čekanju",
   REJECTED: "Odbijeno",
 };

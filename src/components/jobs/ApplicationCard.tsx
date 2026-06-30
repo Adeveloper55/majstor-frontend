@@ -34,7 +34,7 @@ export function ApplicationCard({ application, statusLabel }: ApplicationCardPro
         </div>
         {application.coverMessage && <p className="mb-3 text-base text-slate-700">{application.coverMessage}</p>}
         <p className="text-sm text-slate-500">
-          {isUnlocked ? "Otključano" : "Prijavljeno"}: {new Date(application.appliedAt).toLocaleString("sr")}
+          {isUnlocked ? "Pregledano" : "Prijavljeno"}: {new Date(application.appliedAt).toLocaleString("sr")}
         </p>
         {isUnlocked && application.tokensSpent > 0 && (
           <p className="mt-2 text-sm font-medium text-green-800">Plaćeno: {application.tokensSpent} tokena</p>

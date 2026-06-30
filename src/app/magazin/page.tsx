@@ -6,7 +6,7 @@ export default function MagazinPage() {
   return (
     <main className="page-container py-12">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-bold text-slate-900">Majstor na klik</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Majstor 365</h1>
         <p className="mt-2 text-lg font-medium text-primary-800">Magazin</p>
         <p className="mt-4 text-lg text-slate-600">
           Saveti, vodiči i vesti o renoviranju, gradnji i održavanju doma.

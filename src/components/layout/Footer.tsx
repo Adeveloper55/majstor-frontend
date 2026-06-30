@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wrench } from "lucide-react";
+import { APP_NAME } from "@/constants";
 
 export function Footer() {
   return (
@@ -7,7 +8,7 @@ export function Footer() {
       <div className="page-container flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-primary-800">
           <Wrench className="h-5 w-5" />
-          <span className="font-semibold">Majstor na klik</span>
+          <span className="font-semibold">{APP_NAME}</span>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-slate-600">
           <Link href="/" className="hover:text-primary-800">
@@ -29,7 +30,7 @@ export function Footer() {
             Prijava
           </Link>
         </div>
-        <p className="text-sm text-slate-500">© {new Date().getFullYear()} Majstor na klik</p>
+        <p className="text-sm text-slate-500">© {new Date().getFullYear()} {APP_NAME}</p>
       </div>
     </footer>
   );

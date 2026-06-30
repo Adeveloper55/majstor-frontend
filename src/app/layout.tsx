@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppShell } from "@/components/layout/AppShell";
+import { APP_NAME } from "@/constants";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -12,13 +13,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Majstor na klik",
+  title: APP_NAME,
   description: "Platforma za povezivanje klijenata i majstora za kućne popravke",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Majstor",
+    title: APP_NAME,
   },
 };
 

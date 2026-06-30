@@ -82,7 +82,7 @@ export default function AdminJobDetailPage() {
         <div className="space-y-1 text-slate-600">
           <p>Grad: {job.city || "—"}</p>
           <p>Kategorija: {job.category?.name}</p>
-          <p>Tokeni (cena lead-a): {job.tokenCost ?? "—"}</p>
+          <p>Tokeni (pregled detalja): {job.tokenCost ?? "—"}</p>
           {job.clientContact && (
             <p>Klijent: {job.clientContact.fullName} ({job.clientContact.email}){job.clientContact.phone ? ` • ${job.clientContact.phone}` : ""}</p>
           )}
@@ -93,7 +93,7 @@ export default function AdminJobDetailPage() {
             <CardHeader><CardTitle>Odobri oglas</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-600">
-                Postavite koliko tokena košta lead za ovaj posao. AI predlog: {job.tokenCost ?? "—"} tokena
+                Postavite koliko tokena košta pregled detalja za ovaj posao. AI predlog: {job.tokenCost ?? "—"} tokena
                 {job.aiScore != null ? ` (ocena ${job.aiScore}/5)` : ""}.
               </p>
               <div className="flex flex-wrap items-end gap-3">
@@ -112,11 +112,11 @@ export default function AdminJobDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Kupljeni leadovi ({unlocked.length})</CardTitle>
+            <CardTitle>Pregledali detalje ({unlocked.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-slate-600">
-              Majstori koji su platili tokene i dobili kontakt klijenta. Više majstora može kupiti isti posao.
+              Majstori i izvođači koji su pogledali detalje i videli kontakt klijenta. Više njih može pogledati isti oglas.
             </p>
             {unlocked.map((app) => (
               <div key={app.id} className="rounded-lg border p-3">
@@ -131,7 +131,7 @@ export default function AdminJobDetailPage() {
                 </div>
               </div>
             ))}
-            {!unlocked.length && <p className="text-slate-500">Još niko nije otključao kontakt za ovaj posao.</p>}
+            {!unlocked.length && <p className="text-slate-500">Još niko nije pogledao detalje za ovaj posao.</p>}
           </CardContent>
         </Card>
 

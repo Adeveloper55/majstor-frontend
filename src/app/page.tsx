@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { HeroSearch } from "@/components/home/HeroSearch";
+import { APP_NAME } from "@/constants";
 import { categoryRoutes } from "@/constants/categories";
 
 const popularCategories = [
@@ -31,18 +32,18 @@ const steps = [
     desc: "Klijent opiše posao; admin odobri i oglas postaje vidljiv majstorima i izvođačima.",
   },
   {
-    title: "Majstori i izvođači kupuju kontakt",
-    desc: "Registrovani majstori i izvođači vide oglase i plaćaju tokene za kontakt klijenta.",
+    title: "Majstori i izvođači gledaju detalje",
+    desc: "Registrovani majstori i izvođači vide oglase i troše tokene da bi videli detalje i kontakt klijenta.",
   },
   {
-    title: "Dogovor i posao",
-    desc: "Kontakt ide direktno — klijent i majstor/izvođač dogovaraju detalje.",
+    title: "Zovu ako žele",
+    desc: "Nakon pregleda detalja, majstor ili izvođač sam odlučuje da li će pozvati klijenta i pitati za posao.",
   },
 ];
 
 const features = [
   { icon: ShieldCheck, title: "Pouzdano", desc: "Recenzije i ocene nakon svakog završenog posla." },
-  { icon: Coins, title: "Fer cena", desc: "Admin određuje koliko tokena košta dodela na posao." },
+  { icon: Coins, title: "Fer cena", desc: "Admin određuje koliko tokena košta pregled detalja posla." },
   { icon: Users, title: "Jednostavno", desc: "Dizajn prilagođen svima — bez komplikacija." },
 ];
 
@@ -56,7 +57,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-4xl text-center">
             <div className="hero-badge">
               <Wrench className="h-4 w-4 shrink-0" aria-hidden />
-              Majstor na klik — brzo, lako, pouzdano
+              {APP_NAME} — brzo, lako, pouzdano
             </div>
             <h1 className="hero-heading mb-6">
               Pronađite majstora za svaku popravku u kući

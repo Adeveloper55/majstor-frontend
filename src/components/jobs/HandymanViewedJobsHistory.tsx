@@ -15,7 +15,7 @@ interface HandymanViewedJobsHistoryProps {
 
 export function HandymanViewedJobsHistory({
   title = "Istorija pregledanih poslova",
-  description = "Poslovi za koje ste kliknuli „Vidi detalje” i otključali kontakt.",
+  description = "Poslovi za koje ste kliknuli „Vidi detalje” i videli kontakt klijenta.",
   limit,
   showViewAllLink = false,
 }: HandymanViewedJobsHistoryProps) {
