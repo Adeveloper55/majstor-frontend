@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { logoutSession } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import type { Handyman } from "@/types";
 import { APP_NAME } from "@/constants";
@@ -36,7 +37,15 @@ export function Header() {
             </span>
           )}
           {user && <span className="hidden text-base font-medium text-slate-700 sm:inline">{user.fullName || user.email}</span>}
-          <Button variant="outline" size="sm" onClick={() => { logout(); router.push("/login"); }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              await logoutSession();
+              logout();
+              router.push("/login");
+            }}
+          >
             Odjava
           </Button>
         </div>

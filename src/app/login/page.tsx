@@ -22,11 +22,16 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const { data } = await api.post<{ token: string; role: Role; user: User | Handyman }>("/api/auth/login", {
+      const { data } = await api.post<{
+        token: string;
+        refreshToken: string;
+        role: Role;
+        user: User | Handyman;
+      }>("/api/auth/login", {
         email,
         password,
       });
-      login(data.token, data.role, data.user);
+      login(data.token, data.refreshToken, data.role, data.user);
       const dest = data.role === "ROLE_ADMIN" ? "/admin" : "/dashboard";
       window.location.href = dest;
     } catch (err: unknown) {

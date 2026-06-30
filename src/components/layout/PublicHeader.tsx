@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { SiteHeaderNav } from "@/components/layout/header/SiteHeaderNav";
 import { useAuthStore } from "@/store/authStore";
+import { logoutSession } from "@/lib/auth";
 
 export function PublicHeader({ compact = false }: { compact?: boolean }) {
   const router = useRouter();
@@ -18,7 +19,8 @@ export function PublicHeader({ compact = false }: { compact?: boolean }) {
       isLoggedIn={isLoggedIn}
       panelHref={panelHref}
       userLabel={user?.fullName || user?.email}
-      onLogout={() => {
+      onLogout={async () => {
+        await logoutSession();
         logout();
         router.push("/");
       }}

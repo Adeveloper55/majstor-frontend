@@ -18,7 +18,7 @@ import { validatePib, normalizePib } from "@/lib/pibValidation";
 import type { Handyman } from "@/types";
 
 export default function ProfilePage() {
-  const { user, role, login, token } = useAuth();
+  const { user, role, login, token, refreshToken } = useAuth();
   const { data: allCategories } = useCategories();
   const handymanUser = user as Handyman | null;
   const [form, setForm] = useState({
@@ -77,7 +77,7 @@ export default function ProfilePage() {
           }
         : form;
     const { data } = await api.put(url, payload);
-    if (token && role) login(token, role, data);
+    if (token && refreshToken && role) login(token, refreshToken, role, data);
     setSaved(true);
   };
 

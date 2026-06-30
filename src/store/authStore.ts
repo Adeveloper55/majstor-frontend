@@ -1,37 +1,32 @@
 import { create } from "zustand";
 import type { AuthState, Handyman, Role, User } from "@/types";
+import { AUTH_COOKIE_MAX_AGE, clearAuth, setAuthSession } from "@/lib/auth";
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
+  refreshToken: null,
   role: null,
   user: null,
-  login: (token, role, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-    localStorage.setItem("user", JSON.stringify(user));
-    document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=86400; SameSite=Lax`;
-    document.cookie = `role=${encodeURIComponent(role)}; path=/; max-age=86400; SameSite=Lax`;
-    set({ token, role, user });
+  login: (token, refreshToken, role, user) => {
+    setAuthSession(token, refreshToken, role, user);
+    set({ token, refreshToken, role, user });
   },
   logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("user");
-    document.cookie = "token=; path=/; max-age=0";
-    document.cookie = "role=; path=/; max-age=0";
-    set({ token: null, role: null, user: null });
+    clearAuth();
+    set({ token: null, refreshToken: null, role: null, user: null });
   },
   hydrate: () => {
     const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
     const role = localStorage.getItem("role") as Role | null;
     const userStr = localStorage.getItem("user");
     const user = userStr ? (JSON.parse(userStr) as User | Handyman) : null;
     if (token) {
-      document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=${AUTH_COOKIE_MAX_AGE}; SameSite=Lax`;
     }
     if (role) {
-      document.cookie = `role=${encodeURIComponent(role)}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `role=${encodeURIComponent(role)}; path=/; max-age=${AUTH_COOKIE_MAX_AGE}; SameSite=Lax`;
     }
-    set({ token, role, user });
+    set({ token, refreshToken, role, user });
   },
 }));

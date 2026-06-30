@@ -151,9 +151,10 @@ export type Role = "ROLE_CLIENT" | "ROLE_HANDYMAN" | "ROLE_ADMIN";
 
 export interface AuthState {
   token: string | null;
+  refreshToken: string | null;
   role: Role | null;
   user: User | Handyman | null;
-  login: (token: string, role: Role, user: User | Handyman) => void;
+  login: (token: string, refreshToken: string, role: Role, user: User | Handyman) => void;
   logout: () => void;
   hydrate: () => void;
 }

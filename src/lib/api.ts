@@ -1,14 +1,48 @@
-import axios from "axios";
-import { clearAuth } from "@/lib/auth";
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import { clearAuth, getRefreshToken } from "@/lib/auth";
+import { useAuthStore } from "@/store/authStore";
+import type { Handyman, Role, User } from "@/types";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
 });
 
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post<{
+        token: string;
+        refreshToken: string;
+        role: Role;
+        user: User | Handyman;
+      }>(`${api.defaults.baseURL}/api/auth/refresh`, { refreshToken })
+      .then((res) => {
+        const { token, refreshToken: newRefresh, role, user } = res.data;
+        useAuthStore.getState().login(token, newRefresh, role, user);
+        return token;
+      })
+      .catch(() => {
+        clearAuth();
+        return null;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+}
+
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const url = config.url || "";
-    const isPublicAuth = url.startsWith("/api/auth/") && !url.startsWith("/api/auth/refresh");
+    const isPublicAuth =
+      url.startsWith("/api/auth/") && !url.startsWith("/api/auth/refresh");
     const token = localStorage.getItem("token");
     if (token && !isPublicAuth) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -19,11 +53,24 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (typeof window !== "undefined" && error.response?.status === 401) {
-      const hadAuth = Boolean(error.config?.headers?.Authorization);
+  async (error: AxiosError) => {
+    const original = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    if (
+      typeof window !== "undefined" &&
+      error.response?.status === 401 &&
+      original &&
+      !original._retry &&
+      !original.url?.includes("/api/auth/refresh") &&
+      !original.url?.includes("/api/auth/login")
+    ) {
+      const hadAuth = Boolean(original.headers?.Authorization);
       if (hadAuth) {
-        clearAuth();
+        original._retry = true;
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          original.headers.Authorization = `Bearer ${newToken}`;
+          return api(original);
+        }
         window.location.href = "/login";
       }
     }

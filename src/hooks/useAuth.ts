@@ -2,23 +2,24 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { clearAuth } from "@/lib/auth";
+import { logoutSession } from "@/lib/auth";
 
 export function useAuth() {
-  const { token, role, user, login, logout, hydrate } = useAuthStore();
+  const { token, role, user, login, logout, hydrate, refreshToken } = useAuthStore();
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutSession();
     logout();
-    clearAuth();
     window.location.href = "/login";
   };
 
   return {
     token,
+    refreshToken,
     role,
     user,
     login,
