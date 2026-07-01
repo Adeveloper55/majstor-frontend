@@ -1,6 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" fill="none">
-  <rect width="192" height="192" rx="32" fill="#1e40af"/>
-  <path d="M96 40l-8 24H64l20 16-8 24 20-14 20 14-8-24 20-16h-24L96 40z" fill="#ffffff" opacity="0.95"/>
-  <rect x="56" y="130" width="80" height="12" rx="6" fill="#ffffff" opacity="0.8"/>
-  <rect x="72" y="148" width="48" height="8" rx="4" fill="#ffffff" opacity="0.6"/>
+  <defs>
+    <linearGradient id="bg" x1="24" y1="18" x2="168" y2="174" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1e40af"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+  <g transform="translate(96 93) scale(0.375)">
+    <path d="M-92 -18c0-34 28-62 62-62 18 0 34 8 46 20l18-18 28 28-18 18c12 12 20 28 20 46 0 34-28 62-62 62-34 0-62-28-62-62z" fill="#ffffff" opacity="0.96"/>
+    <path d="M34 34l52 52-18 18-52-52 18-18z" fill="#ffffff" opacity="0.96"/>
+    <rect x="-118" y="78" width="236" height="34" rx="17" fill="#ffffff" opacity="0.88"/>
+    <rect x="-78" y="126" width="156" height="24" rx="12" fill="#ffffff" opacity="0.62"/>
+  </g>
+  <circle cx="147" cy="45" r="19" fill="#fbbf24"/>
+  <text x="147" y="51" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" fill="#1e3a8a">365</text>
 </svg>

@@ -13,10 +13,49 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://majstor365.com";
+const SITE_DESCRIPTION =
+  "Platforma za povezivanje klijenata i majstora za kućne popravke i sve vrste radova.";
+
 export const metadata: Metadata = {
-  title: APP_NAME,
-  description: "Platforma za povezivanje klijenata i majstora za kućne popravke",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: APP_NAME,
+    template: `%s | ${APP_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  openGraph: {
+    type: "website",
+    locale: "sr_RS",
+    url: SITE_URL,
+    siteName: APP_NAME,
+    title: APP_NAME,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Majstor 365 — pronađi pouzdanog majstora",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: APP_NAME,
+    description: SITE_DESCRIPTION,
+    images: ["/twitter-image.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
