@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import type { EmailAvailabilityStatus } from "@/hooks/useEmailAvailability";
+import { EmailAvailabilityInput } from "@/components/shared/EmailAvailabilityInput";
 import { validateStepOne } from "@/lib/companyRegistrationValidation";
 import type { CompanyRegistrationStepOneData } from "@/types/companyRegistration";
 import { RegistrationStepActions } from "./RegistrationStepActions";
@@ -20,12 +21,22 @@ export function CompanyRegistrationStepOne({
   onNext,
 }: CompanyRegistrationStepOneProps) {
   const [errors, setErrors] = useState<{ email?: string; phone?: string }>({});
+  const [emailStatus, setEmailStatus] = useState<EmailAvailabilityStatus>("idle");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const result = validateStepOne(data.email, data.phone);
-    setErrors(result.errors);
-    if (!result.isValid) return;
+    const nextErrors = { ...result.errors };
+
+    if (emailStatus !== "available") {
+      nextErrors.email =
+        emailStatus === "taken" || emailStatus === "invalid"
+          ? "Email nije dostupan za registraciju."
+          : "Sačekajte proveru email adrese.";
+    }
+
+    setErrors(nextErrors);
+    if (!result.isValid || emailStatus !== "available") return;
 
     onChange({
       email: result.email,
@@ -37,22 +48,16 @@ export function CompanyRegistrationStepOne({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-      <div>
-        <Label htmlFor="company-email" className="text-sm font-medium text-slate-800">
-          Vaš e-mail (korisničko ime):
-        </Label>
-        <Input
-          id="company-email"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          placeholder="npr. firma@email.rs"
-          value={data.email}
-          onChange={(e) => onChange({ ...data, email: e.target.value })}
-          className={cn("mt-2 h-11 rounded-lg text-base sm:h-12", errors.email && "border-red-400")}
-        />
-        {errors.email && <p className="mt-1.5 text-sm text-red-600">{errors.email}</p>}
-      </div>
+      <EmailAvailabilityInput
+        id="company-email"
+        label="Vaš e-mail (korisničko ime):"
+        placeholder="npr. firma@email.rs"
+        value={data.email}
+        onChange={(email) => onChange({ ...data, email })}
+        onAvailabilityChange={({ status }) => setEmailStatus(status)}
+        className={cn("mt-2 h-11 rounded-lg text-base sm:h-12", errors.email && "border-red-400")}
+      />
+      {errors.email && <p className="-mt-3 text-sm text-red-600">{errors.email}</p>}
 
       <div>
         <Label htmlFor="company-phone" className="text-sm font-medium text-slate-800">
@@ -81,7 +86,7 @@ export function CompanyRegistrationStepOne({
         <p className="mt-1.5 text-xs text-slate-500">Unesite broj bez pozivnog +381 (npr. 641234567).</p>
       </div>
 
-      <RegistrationStepActions />
+      <RegistrationStepActions submitDisabled={emailStatus === "checking"} />
     </form>
   );
 }

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api";
 import { isValidSerbianPhone } from "@/lib/phoneUtils";
+import type { EmailAvailabilityStatus } from "@/hooks/useEmailAvailability";
+import { EmailAvailabilityInput } from "@/components/shared/EmailAvailabilityInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function RegisterClientPage() {
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "", city: "" });
+  const [emailStatus, setEmailStatus] = useState<EmailAvailabilityStatus>("idle");
   const [phoneError, setPhoneError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,6 +24,15 @@ export default function RegisterClientPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    if (emailStatus !== "available") {
+      setError(emailStatus === "taken" || emailStatus === "invalid"
+        ? "Email nije dostupan za registraciju."
+        : "Sačekajte proveru email adrese.");
+      setLoading(false);
+      return;
+    }
+
     if (form.phone.trim() && !isValidSerbianPhone(form.phone)) {
       setPhoneError("Unesite ispravan srpski mobilni broj (npr. 0641234567).");
       setLoading(false);
@@ -48,27 +60,57 @@ export default function RegisterClientPage() {
         <CardHeader><CardTitle>Registracija klijenta</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {(["fullName", "email", "password", "phone", "city"] as const).map((field) => (
-              <div key={field}>
-                <Label htmlFor={field}>
-                  {field === "fullName" ? "Ime i prezime" : field === "email" ? "Email" : field === "password" ? "Lozinka" : field === "phone" ? "Telefon" : "Grad"}
-                </Label>
-                <Input
-                  id={field}
-                  type={field === "password" ? "password" : field === "email" ? "email" : field === "phone" ? "tel" : "text"}
-                  required={field === "fullName" || field === "email" || field === "password"}
-                  placeholder={field === "phone" ? "npr. 0641234567" : undefined}
-                  value={form[field]}
-                  onChange={(e) => {
-                    setForm({ ...form, [field]: e.target.value });
-                    if (field === "phone" && phoneError) setPhoneError("");
-                  }}
-                />
-                {field === "phone" && phoneError && <p className="mt-1 text-sm text-red-600">{phoneError}</p>}
-              </div>
-            ))}
+            <div>
+              <Label htmlFor="fullName">Ime i prezime</Label>
+              <Input
+                id="fullName"
+                required
+                value={form.fullName}
+                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              />
+            </div>
+            <EmailAvailabilityInput
+              id="email"
+              value={form.email}
+              onChange={(email) => setForm({ ...form, email })}
+              onAvailabilityChange={({ status }) => setEmailStatus(status)}
+            />
+            <div>
+              <Label htmlFor="password">Lozinka</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Telefon</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="npr. 0641234567"
+                value={form.phone}
+                onChange={(e) => {
+                  setForm({ ...form, phone: e.target.value });
+                  if (phoneError) setPhoneError("");
+                }}
+              />
+              {phoneError && <p className="mt-1 text-sm text-red-600">{phoneError}</p>}
+            </div>
+            <div>
+              <Label htmlFor="city">Grad</Label>
+              <Input
+                id="city"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+              />
+            </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>{loading ? "Registracija..." : "Registruj se"}</Button>
+            <Button type="submit" className="w-full" disabled={loading || emailStatus === "checking"}>
+              {loading ? "Registracija..." : "Registruj se"}
+            </Button>
           </form>
           <p className="mt-4 text-center text-sm">
             Već imaš nalog? <Link href="/login" className="text-blue-800 hover:underline">Prijavi se</Link>

@@ -8,7 +8,9 @@ import { resolveApiBaseUrl } from "@/lib/apiUrl";
 import { validatePib, normalizePib } from "@/lib/pibValidation";
 import { isValidSerbianPhone } from "@/lib/phoneUtils";
 import { useCategories } from "@/hooks/useJobs";
+import type { EmailAvailabilityStatus } from "@/hooks/useEmailAvailability";
 import { CategoryPicker } from "@/components/shared/CategoryPicker";
+import { EmailAvailabilityInput } from "@/components/shared/EmailAvailabilityInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +30,7 @@ export default function RegisterHandymanPage() {
   const [pibError, setPibError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [categoryError, setCategoryError] = useState("");
+  const [emailStatus, setEmailStatus] = useState<EmailAvailabilityStatus>("idle");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -39,6 +42,14 @@ export default function RegisterHandymanPage() {
     setError("");
     setPibError("");
     setCategoryError("");
+
+    if (emailStatus !== "available") {
+      setError(emailStatus === "taken" || emailStatus === "invalid"
+        ? "Email nije dostupan za registraciju."
+        : "Sačekajte proveru email adrese.");
+      setLoading(false);
+      return;
+    }
 
     if (!categoriesReady) {
       setError("Kategorije nisu učitane. Proverite konekciju sa serverom i pokušajte ponovo.");
@@ -97,7 +108,11 @@ export default function RegisterHandymanPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div><Label>Ime i prezime</Label><Input required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} /></div>
-            <div><Label>Email</Label><Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+            <EmailAvailabilityInput
+              value={form.email}
+              onChange={(email) => setForm({ ...form, email })}
+              onAvailabilityChange={({ status }) => setEmailStatus(status)}
+            />
             <div><Label>Lozinka</Label><Input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
             <div>
               <Label>Telefon</Label>
@@ -155,7 +170,7 @@ export default function RegisterHandymanPage() {
             )}
             <div><Label>O meni</Label><Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} /></div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || emailStatus === "checking"}>
               {loading ? "Registracija..." : "Registruj se"}
             </Button>
           </form>
