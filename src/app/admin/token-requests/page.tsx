@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { unwrapPage } from "@/lib/utils";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -52,9 +52,7 @@ export default function AdminTokenRequestsPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-57px)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">Zahtevi za tokene</h1>
         <p className="mb-6 text-sm text-slate-600">
           Majstor ili izvođač izabere paket → admin pošalje predračun sa IPS QR kodom → nakon uplate admin odobri i tokeni se dodaju.
@@ -106,7 +104,6 @@ export default function AdminTokenRequestsPage() {
           ))}
           {!isLoading && !isError && !data?.length && <p className="text-gray-500">Nema zahteva.</p>}
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/badge";
 import type { JobListing } from "@/types";
 import { JOB_STATUS_LABELS } from "@/constants";
@@ -16,9 +16,7 @@ export default function AdminPendingJobsPage() {
   });
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-2 text-2xl font-bold">Poslovi na čekanju</h1>
         <p className="mb-6 text-sm text-slate-600">
           Klijentski oglasi čekaju odobrenje. Postavite broj tokena i kliknite „Dozvoli posao” — oglas tada postaje vidljiv majstorima i izvođačima.
@@ -46,7 +44,6 @@ export default function AdminPendingJobsPage() {
           ))}
           {!data?.length && <p className="text-slate-500">Nema poslova na čekanju.</p>}
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

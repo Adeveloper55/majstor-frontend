@@ -68,7 +68,10 @@ api.interceptors.response.use(
       original &&
       !original._retry &&
       !original.url?.includes("/api/auth/refresh") &&
-      !original.url?.includes("/api/auth/login")
+      !original.url?.includes("/api/auth/login") &&
+      !original.url?.includes("/api/handymen/search") &&
+      !original.url?.includes("/api/handymen/count") &&
+      !original.url?.includes("/api/handymen/public-profile/")
     ) {
       const hadAuth = Boolean(original.headers?.Authorization);
       if (hadAuth) {

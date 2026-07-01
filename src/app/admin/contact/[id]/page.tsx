@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,17 +54,14 @@ export default function AdminContactDetailPage() {
 
   if (!msg) {
     return (
-      <div className="flex min-h-[calc(100vh-4rem)]">
-        <AdminSidebar />
-        <main className="flex-1 p-6"><p>Učitavanje...</p></main>
-      </div>
+      <AdminLayout className="p-4 sm:p-6">
+        <p>Učitavanje...</p>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <Link href="/admin/contact" className="mb-4 inline-block text-sm text-primary-800 hover:underline">
           ← Nazad na poruke
         </Link>
@@ -103,7 +100,6 @@ export default function AdminContactDetailPage() {
             </Button>
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

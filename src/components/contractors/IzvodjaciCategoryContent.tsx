@@ -26,7 +26,7 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
   const [cityInput, setCityInput] = useState(cityParam);
   const [cityError, setCityError] = useState("");
 
-  const { data: results, isLoading } = useHandymanSearch(slug, cityParam);
+  const { data: results, isLoading, isError } = useHandymanSearch(slug, cityParam);
 
   useEffect(() => {
     setCityInput(cityParam);
@@ -103,30 +103,21 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
   const resultCount = results?.content.length ?? 0;
 
   return (
-    <main className="bg-gradient-to-b from-slate-50 to-white px-4 py-8 sm:py-12">
-      <div className="page-container mx-auto max-w-4xl">
-        <div className="mb-8">
+    <main className="bg-gradient-to-b from-slate-50 to-white px-4 py-8 sm:py-10">
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
             {category.name}, {cityParam}
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-slate-600">
+          <p className="mt-3 text-base leading-relaxed text-slate-600">
             Prikazujemo proverene izvođače za uslugu{" "}
             <span className="font-medium text-slate-800">{category.name.toLowerCase()}</span> u gradu{" "}
             <span className="font-medium text-slate-800">{cityParam}</span>. Izaberite izvođača ili pošaljite
-            besplatnu potražnju — mi vam predlažemo najbolje opcije.
+            besplatnu potražnju.
           </p>
-          <Link
-            href={`/nadji-majstore/upit?kategorija=${encodeURIComponent(slug)}&grad=${encodeURIComponent(cityParam)}`}
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "mt-6 inline-flex rounded-full bg-brand-600 hover:bg-brand-700"
-            )}
-          >
-            Pošalji potražnju
-          </Link>
 
           {results && results.totalCount > 0 && (
-            <div className="mt-6 flex flex-wrap gap-6 text-sm text-slate-600">
+            <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
               {results.averageRating != null && results.averageRating > 0 && (
                 <span className="inline-flex items-center gap-2">
                   <Star className="h-4 w-4 fill-brand-500 text-brand-500" />
@@ -140,9 +131,9 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
               </span>
             </div>
           )}
-        </div>
+        </header>
 
-        <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4">
+        <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="min-w-[220px] flex-1">
             <CityAutocomplete
               value={cityInput}
@@ -158,8 +149,14 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
 
         {isLoading && <p className="text-slate-500">Učitavanje izvođača...</p>}
 
-        {!isLoading && resultCount === 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+        {isError && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+            <p className="text-red-700">Greška pri učitavanju izvođača. Osvežite stranicu.</p>
+          </div>
+        )}
+
+        {!isLoading && !isError && resultCount === 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm sm:p-8">
             <p className="text-lg text-slate-700">
               Trenutno nema registrovanih izvođača za ovu kategoriju u gradu {cityParam}.
             </p>

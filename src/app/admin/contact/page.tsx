@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/badge";
 
 interface ContactMessage {
@@ -25,9 +25,7 @@ export default function AdminContactMessagesPage() {
   });
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">Kontakt poruke</h1>
         <div className="space-y-3">
           {data?.length === 0 && (
@@ -58,7 +56,6 @@ export default function AdminContactMessagesPage() {
             </Link>
           ))}
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

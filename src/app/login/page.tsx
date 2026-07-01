@@ -43,6 +43,9 @@ export default function LoginPage() {
       } else if (axiosErr.response.status === 403) {
         const msg = (axiosErr as { response?: { data?: { message?: string } } }).response?.data?.message;
         setError(msg || "Email nije potvrđen. Proverite inbox.");
+      } else if (axiosErr.response.status === 400) {
+        const msg = (axiosErr as { response?: { data?: { message?: string } } }).response?.data?.message;
+        setError(msg || "Greška pri prijavi.");
       } else {
         setError("Greška pri prijavi. Proveri da li backend radi ispravno.");
       }
@@ -68,7 +71,7 @@ export default function LoginPage() {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            {error.includes("potvrđen") && (
+            {error.includes("potvrđen") && !error.includes("čeka odobrenje") && (
               <p className="text-sm">
                 <Link href="/register/check-email" className="text-blue-800 hover:underline">
                   Pošalji ponovo link za verifikaciju

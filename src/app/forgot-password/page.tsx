@@ -21,8 +21,9 @@ export default function ForgotPasswordPage() {
     try {
       await api.post("/api/auth/forgot-password", { email: email.trim() });
       setSent(true);
-    } catch {
-      setError("Greška pri slanju. Proverite email i pokušajte ponovo.");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(msg || "Greška pri slanju. Proverite email i pokušajte ponovo.");
     } finally {
       setLoading(false);
     }

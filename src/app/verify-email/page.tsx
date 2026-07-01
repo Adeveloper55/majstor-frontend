@@ -15,6 +15,7 @@ function VerifyEmailContent() {
   const token = searchParams.get("token") || "";
   const [status, setStatus] = useState<VerifyStatus>("loading");
   const [message, setMessage] = useState("");
+  const [accountType, setAccountType] = useState<string | null>(null);
   const startedRef = useRef(false);
 
   useEffect(() => {
@@ -29,9 +30,10 @@ function VerifyEmailContent() {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
-        const data = JSON.parse(cached) as { status: string; message: string };
+        const data = JSON.parse(cached) as { status: string; message: string; accountType?: string };
         setStatus(data.status as VerifyStatus);
         setMessage(data.message);
+        setAccountType(data.accountType ?? null);
         return;
       } catch {
         sessionStorage.removeItem(cacheKey);
@@ -41,11 +43,12 @@ function VerifyEmailContent() {
     startedRef.current = true;
 
     api
-      .get<{ status: string; message: string }>(`/api/auth/verify-email?token=${encodeURIComponent(token)}`)
+      .get<{ status: string; message: string; accountType?: string }>(`/api/auth/verify-email?token=${encodeURIComponent(token)}`)
       .then(({ data }) => {
         sessionStorage.setItem(cacheKey, JSON.stringify(data));
         setStatus(data.status as VerifyStatus);
         setMessage(data.message);
+        setAccountType(data.accountType ?? null);
       })
       .catch((err: unknown) => {
         const msg = (err as { response?: { data?: { message?: string; status?: string } } })?.response?.data;
@@ -65,6 +68,7 @@ function VerifyEmailContent() {
   }, [token]);
 
   const isSuccess = status === "VERIFIED" || status === "ALREADY_VERIFIED";
+  const isCompany = accountType === "ROLE_COMPANY";
   const isExpired = status === "EXPIRED" || status === "STALE_LINK";
 
   return (
@@ -78,7 +82,8 @@ function VerifyEmailContent() {
         )}
         <CardTitle>
           {status === "loading" && "Verifikacija u toku..."}
-          {isSuccess && "Email potvrđen!"}
+          {isSuccess && !isCompany && "Email potvrđen!"}
+          {isSuccess && isCompany && "Email preduzeća potvrđen"}
           {isExpired && (status === "STALE_LINK" ? "Link nije aktuelan" : "Link je istekao")}
           {(status === "INVALID" || status === "error") && "Verifikacija nije uspela"}
         </CardTitle>
@@ -86,10 +91,24 @@ function VerifyEmailContent() {
       <CardContent className="space-y-4 text-center">
         <p className="text-slate-600">{message || "Molimo sačekajte..."}</p>
 
-        {isSuccess && (
+        {isSuccess && !isCompany && (
           <Link href="/login">
             <Button className="w-full">Prijavi se</Button>
           </Link>
+        )}
+
+        {isSuccess && isCompany && (
+          <div className="space-y-3">
+            <p className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Prijava preduzeća čeka odobrenje admina. Kada bude odobrena, dobićete email i moći ćete se
+              prijaviti.
+            </p>
+            <Link href="/">
+              <Button variant="outline" className="w-full">
+                Nazad na početnu
+              </Button>
+            </Link>
+          </div>
         )}
 
         {isExpired && (

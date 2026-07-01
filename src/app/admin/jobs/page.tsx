@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Badge } from "@/components/ui/badge";
 import type { JobListing } from "@/types";
 import { JOB_STATUS_LABELS } from "@/constants";
@@ -15,9 +15,7 @@ export default function AdminJobsPage() {
   });
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Svi poslovi</h1>
           <Link href="/admin/jobs/new" className="rounded-lg bg-primary-800 px-4 py-2 text-sm font-medium text-white hover:bg-primary-900">+ Novi posao</Link>
@@ -33,7 +31,6 @@ export default function AdminJobsPage() {
             </Link>
           ))}
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

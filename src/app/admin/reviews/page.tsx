@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { ReviewCard } from "@/components/reviews/ReviewCard";
@@ -26,9 +26,7 @@ export default function AdminReviewsPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">Recenzije</h1>
         <div className="space-y-4">
           {data?.map((r) => (
@@ -47,7 +45,6 @@ export default function AdminReviewsPage() {
           confirmLabel="Ukloni"
           onConfirm={removeReview}
         />
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

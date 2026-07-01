@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Input } from "@/components/ui/input";
 import type { Handyman } from "@/types";
 
@@ -16,9 +16,7 @@ export default function AdminHandymenPage() {
   });
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Majstori</h1>
           <Link href="/admin/handymen/new" className="rounded-lg bg-primary-800 px-4 py-2 text-sm font-medium text-white hover:bg-primary-900">+ Novi majstor</Link>
@@ -40,7 +38,6 @@ export default function AdminHandymenPage() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

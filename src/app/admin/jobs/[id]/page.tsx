@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -68,12 +68,16 @@ export default function AdminJobDetailPage() {
     }
   };
 
-  if (!job) return <p className="p-8">Učitavanje...</p>;
+  if (!job) {
+    return (
+      <AdminLayout className="p-4 sm:p-6">
+        <p>Učitavanje...</p>
+      </AdminLayout>
+    );
+  }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 space-y-6 p-6">
+    <AdminLayout className="space-y-6 p-4 sm:p-6">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">{job.title}</h1>
           <Badge>{JOB_STATUS_LABELS[job.status] || job.status}</Badge>
@@ -137,7 +141,6 @@ export default function AdminJobDetailPage() {
 
         <Button variant="destructive" onClick={() => setConfirmOpen(true)}>Ukloni oglas</Button>
         <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} title="Ukloniti oglas?" confirmLabel="Ukloni" onConfirm={remove} />
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

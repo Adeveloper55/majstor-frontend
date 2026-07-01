@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { validatePib, normalizePib } from "@/lib/pibValidation";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,9 +67,7 @@ export default function AdminCreateHandymanPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Novi majstor</h1>
           <Link href="/admin/handymen" className="text-sm text-primary-800 hover:underline">← Nazad na listu</Link>
@@ -107,7 +105,6 @@ export default function AdminCreateHandymanPage() {
             </form>
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

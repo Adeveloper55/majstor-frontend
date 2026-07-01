@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Input } from "@/components/ui/input";
 import type { User } from "@/types";
 
@@ -16,9 +16,7 @@ export default function AdminUsersPage() {
   });
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">Klijenti</h1>
         <Input placeholder="Pretraži po imenu ili emailu..." value={search} onChange={(e) => setSearch(e.target.value)} className="mb-4 max-w-md" />
         <div className="overflow-x-auto rounded-xl border-2 border-slate-200 bg-white">
@@ -36,7 +34,6 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

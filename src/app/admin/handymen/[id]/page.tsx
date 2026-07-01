@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,9 +52,7 @@ export default function AdminHandymanDetailPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <AdminSidebar />
-      <main className="flex-1 p-6">
+    <AdminLayout className="p-4 sm:p-6">
         <h1 className="mb-6 text-2xl font-bold">{data?.fullName}</h1>
         <div className="mb-6 space-y-2 text-base">
           <p><strong>Email:</strong> {data?.email}</p>
@@ -83,7 +81,6 @@ export default function AdminHandymanDetailPage() {
           confirmLabel="Deaktiviraj"
           onConfirm={deactivate}
         />
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

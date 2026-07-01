@@ -194,11 +194,6 @@ export function CompanyRegistrationPage() {
                     Nazad na početnu
                   </Button>
                 </Link>
-                <Link href="/login" className="w-full sm:w-auto">
-                  <Button className="h-11 w-full bg-brand-600 hover:bg-brand-700 sm:w-auto">
-                    Prijava
-                  </Button>
-                </Link>
               </div>
             </div>
           )}
