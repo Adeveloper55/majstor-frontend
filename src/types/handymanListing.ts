@@ -16,6 +16,7 @@ export interface HandymanListing {
   averageRating?: number;
   totalReviews?: number;
   phone?: string | null;
+  maskedPhone?: string | null;
   email?: string | null;
   latestReview?: HandymanReviewSnippet | null;
   yearsExperience?: number | null;
@@ -30,4 +31,11 @@ export interface HandymanSearchResponse {
   averageRating?: number | null;
   totalReviews: number;
   content: HandymanListing[];
+}
+
+export interface HandymanProfile extends Omit<HandymanListing, "latestReview"> {
+  contactPerson?: string | null;
+  contactVisible: boolean;
+  serviceNames: string[];
+  latestReview?: HandymanReviewSnippet | null;
 }

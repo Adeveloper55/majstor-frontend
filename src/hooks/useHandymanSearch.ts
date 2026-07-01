@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import type { HandymanSearchResponse } from "@/types/handymanListing";
+import type { HandymanProfile, HandymanSearchResponse } from "@/types/handymanListing";
 
 export function useHandymanCategoryCount(categorySlug: string) {
   return useQuery({
@@ -21,5 +21,14 @@ export function useHandymanSearch(categorySlug: string, city: string) {
       if (city.trim()) params.set("city", city.trim());
       return (await api.get<HandymanSearchResponse>(`/api/handymen/search?${params}`)).data;
     },
+  });
+}
+
+export function useHandymanProfile(id: string) {
+  return useQuery({
+    queryKey: ["handyman-profile", id],
+    enabled: Boolean(id),
+    queryFn: async () =>
+      (await api.get<HandymanProfile>(`/api/handymen/public-profile/${id}`)).data,
   });
 }

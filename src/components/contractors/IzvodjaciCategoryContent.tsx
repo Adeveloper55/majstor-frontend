@@ -8,10 +8,9 @@ import { getCategoryBySlug } from "@/constants/categories";
 import { CityAutocomplete } from "@/components/shared/CityAutocomplete";
 import { ContractorCard } from "@/components/contractors/ContractorCard";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { useHandymanCategoryCount, useHandymanSearch } from "@/hooks/useHandymanSearch";
 import { getCityCoordinates } from "@/constants/serbianCities";
 import { searchCities } from "@/lib/citySearch";
+import { useHandymanSearch } from "@/hooks/useHandymanSearch";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
 
@@ -24,13 +23,9 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
   const searchParams = useSearchParams();
   const cityParam = searchParams.get("grad") || "";
   const category = getCategoryBySlug(slug);
-  const { token, role } = useAuth();
-  const isLoggedIn = Boolean(token) && (role === "ROLE_CLIENT" || role === "ROLE_HANDYMAN");
-
   const [cityInput, setCityInput] = useState(cityParam);
   const [cityError, setCityError] = useState("");
 
-  const { data: totalCount } = useHandymanCategoryCount(slug);
   const { data: results, isLoading } = useHandymanSearch(slug, cityParam);
 
   useEffect(() => {
@@ -63,16 +58,6 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
       <main className="bg-gradient-to-b from-slate-50 to-white px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">{category.name}</h1>
-          <p className="mt-3 text-lg text-slate-600">
-            {totalCount != null ? (
-              <>
-                <span className="font-semibold text-slate-800">{totalCount.toLocaleString("sr-RS")}</span>{" "}
-                {totalCount === 1 ? "izvođač" : "izvođača"} na platformi
-              </>
-            ) : (
-              "Učitavanje..."
-            )}
-          </p>
 
           <div className="mx-auto mt-10 max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p className="mb-4 text-left text-base text-slate-700">
@@ -200,8 +185,9 @@ export function IzvodjaciCategoryContent({ slug }: IzvodjaciCategoryContentProps
                 <ContractorCard
                   key={contractor.id}
                   contractor={contractor}
+                  categorySlug={slug}
                   categoryName={category.name}
-                  isLoggedIn={isLoggedIn}
+                  city={cityParam}
                 />
               ))}
             </div>

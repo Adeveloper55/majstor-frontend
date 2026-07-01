@@ -2,15 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Phone, Star, Users } from "lucide-react";
+import { ChevronRight, MapPin, Star, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import type { HandymanListing } from "@/types/handymanListing";
 
 interface ContractorCardProps {
   contractor: HandymanListing;
+  categorySlug: string;
   categoryName: string;
-  isLoggedIn: boolean;
+  city: string;
 }
 
 function Stars({ rating }: { rating: number }) {
@@ -29,17 +30,21 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export function ContractorCard({ contractor, categoryName, isLoggedIn }: ContractorCardProps) {
+export function ContractorCard({ contractor, categorySlug, categoryName, city }: ContractorCardProps) {
   const rating = contractor.averageRating ?? 0;
   const hasReviews = (contractor.totalReviews ?? 0) > 0;
+  const profileHref = `/izvodjaci/${categorySlug}/${contractor.id}?grad=${encodeURIComponent(city)}`;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-5 py-4">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 underline decoration-slate-300 underline-offset-2">
+          <Link
+            href={profileHref}
+            className="text-lg font-bold text-slate-900 underline decoration-slate-300 underline-offset-2 hover:text-brand-700"
+          >
             {contractor.displayName}
-          </h3>
+          </Link>
           <p className="mt-1 text-sm text-slate-500">
             {categoryName}
             {contractor.city ? `, ${contractor.city}` : ""}
@@ -54,8 +59,8 @@ export function ContractorCard({ contractor, categoryName, isLoggedIn }: Contrac
       </div>
 
       <div className="grid gap-5 p-5 md:grid-cols-[200px_1fr]">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-slate-100">
-          {contractor.profileImageUrl ? (
+        {contractor.profileImageUrl ? (
+          <Link href={profileHref} className="relative block aspect-[4/3] overflow-hidden rounded-xl">
             <Image
               src={contractor.profileImageUrl}
               alt={contractor.displayName}
@@ -63,10 +68,10 @@ export function ContractorCard({ contractor, categoryName, isLoggedIn }: Contrac
               className="object-cover"
               sizes="200px"
             />
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-slate-400">Nema slike</div>
-          )}
-        </div>
+          </Link>
+        ) : (
+          <div className="hidden md:block" />
+        )}
 
         <div className="min-w-0">
           {contractor.bio && (
@@ -107,30 +112,16 @@ export function ContractorCard({ contractor, categoryName, isLoggedIn }: Contrac
             )}
           </div>
 
-          <div className="mt-5 border-t border-slate-100 pt-4">
-            {isLoggedIn && contractor.phone ? (
-              <a
-                href={`tel:${contractor.phone}`}
-                className="inline-flex items-center gap-2 text-base font-semibold text-brand-700 hover:underline"
-              >
-                <Phone className="h-4 w-4" />
-                {contractor.phone}
-              </a>
-            ) : (
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                  <Phone className="h-4 w-4" />
-                  Broj telefona dostupan nakon registracije
-                </span>
-                <Link
-                  href="/register/client"
-                  className={cn(buttonVariants({ size: "sm" }), "bg-brand-600 hover:bg-brand-700")}
-                >
-                  Registrujte se
-                </Link>
-              </div>
+          <Link
+            href={profileHref}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "mt-5 inline-flex items-center gap-1"
             )}
-          </div>
+          >
+            Vidi profil
+            <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </article>
