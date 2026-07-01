@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resolveApiBaseUrl } from "@/lib/apiUrl";
-import type { Handyman, Role, User } from "@/types";
+import type { AdminUser, Handyman, Role, User } from "@/types";
 
 /** 7 days — matches backend refresh token lifetime */
 export const AUTH_COOKIE_MAX_AGE = 604800;
@@ -24,7 +24,7 @@ export function setAuthSession(
   token: string,
   refreshToken: string,
   role: Role,
-  user: User | Handyman
+  user: User | Handyman | AdminUser
 ): void {
   if (typeof window === "undefined") return;
   localStorage.setItem("token", token);

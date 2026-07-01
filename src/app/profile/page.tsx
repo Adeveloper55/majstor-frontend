@@ -15,18 +15,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { validatePib, normalizePib } from "@/lib/pibValidation";
-import type { Handyman } from "@/types";
+import type { Handyman, User } from "@/types";
 
 export default function ProfilePage() {
   const { user, role, login, token, refreshToken } = useAuth();
   const { data: allCategories } = useCategories();
   const handymanUser = user as Handyman | null;
+  const profileUser = role !== "ROLE_ADMIN" ? (user as User | Handyman | null) : null;
   const [form, setForm] = useState({
     fullName: user?.fullName || "",
-    phone: user?.phone || "",
-    city: user?.city || "",
+    phone: profileUser?.phone || "",
+    city: profileUser?.city || "",
     bio: handymanUser?.bio || "",
-    profileImageUrl: user?.profileImageUrl || "",
+    profileImageUrl: profileUser?.profileImageUrl || "",
     pib: handymanUser?.pib || "",
     companyName: handymanUser?.companyName || "",
   });

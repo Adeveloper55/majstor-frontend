@@ -6,8 +6,15 @@ import api from "@/lib/api";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
+import type { AdminUser } from "@/types";
 
 export default function AdminDashboardPage() {
+  const user = useAuthStore((s) => s.user) as AdminUser | null;
+  const isPrimaryAdmin = Boolean(
+    user?.primaryAdmin ?? user?.email?.toLowerCase() === "admin@majstor365.com"
+  );
+
   const { data } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => (await api.get<Record<string, number>>("/api/admin/stats")).data,
@@ -22,6 +29,9 @@ export default function AdminDashboardPage() {
     { label: "Pregledani detalji", key: "unlockedLeads", color: "bg-emerald-500", href: "/admin/jobs" },
     { label: "Zahtevi (tokeni)", key: "pendingTokenRequests", color: "bg-amber-500", href: "/admin/token-requests" },
     { label: "Registracije preduzeća", key: "pendingCompanyRegistrations", color: "bg-teal-500", href: "/admin/company-registrations" },
+    ...(isPrimaryAdmin
+      ? [{ label: "Novi upiti", key: "newServiceInquiries", color: "bg-rose-500", href: "/admin/upiti" }]
+      : []),
   ];
 
   const maxVal = Math.max(...stats.map((s) => Number(data?.[s.key] ?? 0)), 1);

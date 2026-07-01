@@ -147,14 +147,21 @@ export interface Review {
   createdAt: string;
 }
 
+export interface AdminUser {
+  id: string;
+  fullName: string;
+  email: string;
+  primaryAdmin?: boolean;
+}
+
 export type Role = "ROLE_CLIENT" | "ROLE_HANDYMAN" | "ROLE_ADMIN";
 
 export interface AuthState {
   token: string | null;
   refreshToken: string | null;
   role: Role | null;
-  user: User | Handyman | null;
-  login: (token: string, refreshToken: string, role: Role, user: User | Handyman) => void;
+  user: User | Handyman | AdminUser | null;
+  login: (token: string, refreshToken: string, role: Role, user: User | Handyman | AdminUser) => void;
   logout: () => void;
   hydrate: () => void;
 }

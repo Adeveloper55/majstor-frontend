@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { SERVICE_CATEGORIES, categoryRoutes } from "@/constants/categories";
+import { SERVICE_CATEGORIES } from "@/constants/categories";
 import { CategoryListPanel } from "./CategoryListPanel";
 
 interface NadjiMajstoreMenuProps {
@@ -21,10 +22,19 @@ const STEPS = [
 ];
 
 export function NadjiMajstoreMenu({ open, onOpen, onClose, active }: NadjiMajstoreMenuProps) {
+  const router = useRouter();
+  const [selectedSlug, setSelectedSlug] = useState(SERVICE_CATEGORIES[0]?.slug ?? "");
+
   const categoryItems = SERVICE_CATEGORIES.map((c) => ({
-    href: categoryRoutes.majstori(c.slug),
+    slug: c.slug,
     label: c.name,
   }));
+
+  const startInquiry = () => {
+    if (!selectedSlug) return;
+    onClose();
+    router.push(`/nadji-majstore/upit?kategorija=${encodeURIComponent(selectedSlug)}`);
+  };
 
   return (
     <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
@@ -49,7 +59,11 @@ export function NadjiMajstoreMenu({ open, onOpen, onClose, active }: NadjiMajsto
                 <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-900">
                   Najtraženije
                 </h3>
-                <CategoryListPanel items={categoryItems} />
+                <CategoryListPanel
+                  items={categoryItems}
+                  selectedSlug={selectedSlug}
+                  onSelect={setSelectedSlug}
+                />
               </div>
               <div className="p-5">
                 <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-900">
@@ -65,15 +79,16 @@ export function NadjiMajstoreMenu({ open, onOpen, onClose, active }: NadjiMajsto
                     </li>
                   ))}
                 </ol>
-                <Link
-                  href="/register/client"
+                <button
+                  type="button"
+                  onClick={startInquiry}
                   className={cn(
                     buttonVariants(),
                     "mt-6 w-full bg-brand-600 text-white hover:bg-brand-700"
                   )}
                 >
                   Nađi majstore
-                </Link>
+                </button>
               </div>
             </div>
           </div>

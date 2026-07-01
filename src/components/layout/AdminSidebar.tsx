@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
+import type { AdminUser } from "@/types";
 
-const links = [
+const baseLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Klijenti" },
   { href: "/admin/handymen", label: "Majstori" },
@@ -18,14 +20,18 @@ const links = [
   { href: "/admin/reviews", label: "Recenzije" },
 ];
 
+const inquiryLink = { href: "/admin/upiti", label: "Upiti" };
+
 function AdminNavLinks({
   pathname,
   onNavigate,
   className,
+  links,
 }: {
   pathname: string;
   onNavigate?: () => void;
   className?: string;
+  links: { href: string; label: string }[];
 }) {
   return (
     <nav className={cn("flex flex-col gap-1", className)}>
@@ -51,6 +57,13 @@ function AdminNavLinks({
 export function AdminSidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const user = useAuthStore((s) => s.user) as AdminUser | null;
+  const isPrimaryAdmin = Boolean(
+    user?.primaryAdmin ?? user?.email?.toLowerCase() === "admin@majstor365.com"
+  );
+  const links = isPrimaryAdmin
+    ? [...baseLinks.slice(0, 4), inquiryLink, ...baseLinks.slice(4)]
+    : baseLinks;
 
   useEffect(() => {
     setMobileOpen(false);
@@ -97,14 +110,14 @@ export function AdminSidebar() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <AdminNavLinks pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+            <AdminNavLinks pathname={pathname} onNavigate={() => setMobileOpen(false)} links={links} />
           </aside>
         </div>
       )}
 
       <aside className="hidden w-56 shrink-0 border-r border-slate-800 bg-gray-900 p-4 text-white md:block">
         <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Admin panel</p>
-        <AdminNavLinks pathname={pathname} />
+        <AdminNavLinks pathname={pathname} links={links} />
       </aside>
     </>
   );

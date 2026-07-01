@@ -18,6 +18,7 @@ const publicPaths = [
   "/izvodjaci",
   "/prosecne-cene",
   "/pretraga",
+  "/nadji-majstore",
   "/registracija-preduzeca",
 ];
 

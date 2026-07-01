@@ -23,11 +23,13 @@ export function AlatiMenu({ open, onOpen, onClose, active }: AlatiMenuProps) {
   const [panel, setPanel] = useState<AlatiPanel>("izvodjaci");
 
   const izvodjaciItems = SERVICE_CATEGORIES.map((c) => ({
+    slug: c.slug,
     href: categoryRoutes.izvodjaci(c.slug),
     label: c.name,
   }));
 
   const ceneItems = SERVICE_CATEGORIES.map((c) => ({
+    slug: c.slug,
     href: categoryRoutes.prosecneCene(c.slug),
     label: getCategoryPriceLabel(c),
   }));
