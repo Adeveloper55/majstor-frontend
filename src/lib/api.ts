@@ -4,7 +4,9 @@ import { resolveApiBaseUrl } from "@/lib/apiUrl";
 import { useAuthStore } from "@/store/authStore";
 import type { Handyman, Role, User } from "@/types";
 
-const api = axios.create();
+const api = axios.create({
+  timeout: 20_000,
+});
 
 function applyBaseUrl(config: InternalAxiosRequestConfig) {
   config.baseURL = resolveApiBaseUrl();
