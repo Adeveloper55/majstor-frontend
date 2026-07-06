@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ interface MobileSiteNavProps {
   panelHref?: string;
   onLogout?: () => void;
   onNavigate: () => void;
+  onClose: () => void;
 }
 
 function Accordion({
@@ -52,17 +54,37 @@ export function MobileSiteNav({
   panelHref = "/dashboard",
   onLogout,
   onNavigate,
+  onClose,
 }: MobileSiteNavProps) {
+  const [mounted, setMounted] = useState(false);
   const [nadjiOpen, setNadjiOpen] = useState(false);
   const [alatiOpen, setAlatiOpen] = useState(false);
   const [izvodjaciOpen, setIzvodjaciOpen] = useState(false);
   const [ceneOpen, setCeneOpen] = useState(false);
 
-  const linkClass =
-    "block rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-600";
+  useEffect(() => setMounted(true), []);
 
-  return (
-    <div className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto border-t border-slate-200 bg-white lg:hidden">
+  const linkClass =
+    "block rounded-md px-3 py-2.5 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-600 active:bg-brand-50";
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <>
+      <button
+        type="button"
+        className="fixed inset-0 z-[90] bg-black/30 md:hidden"
+        aria-label="Zatvori meni"
+        onClick={onClose}
+      />
+      <div
+        id="mobile-site-nav"
+        className="fixed inset-x-0 top-16 bottom-0 z-[100] overflow-y-auto overscroll-contain border-t border-slate-200 bg-white shadow-lg md:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobilna navigacija"
+      >
       <Accordion title="Nađi majstore" open={nadjiOpen} onToggle={() => setNadjiOpen((v) => !v)}>
         <ul className="max-h-64 overflow-y-auto">
           {SERVICE_CATEGORIES.map((c) => (
@@ -188,5 +210,7 @@ export function MobileSiteNav({
         )}
       </div>
     </div>
+    </>,
+    document.body
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Menu, Wrench, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,11 +29,13 @@ export function SiteHeaderNav({
   onLogout,
   compact = false,
 }: SiteHeaderNavProps) {
+  const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
   const closeMenus = useCallback(() => setOpenMenu(null), []);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {
@@ -50,6 +53,19 @@ export function SiteHeaderNav({
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  useEffect(() => {
+    closeMobile();
+  }, [pathname, closeMobile]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMobile();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen, closeMobile]);
 
   return (
     <header ref={headerRef} className="glass-nav sticky top-0 z-50 border-b border-slate-200 bg-white">
@@ -131,27 +147,16 @@ export function SiteHeaderNav({
             </div>
           )}
 
-          {compact && isLoggedIn && onLogout && (
-            <button
-              type="button"
-              onClick={onLogout}
-              className={cn(buttonVariants({ variant: "outline", size: "sm" }), "ml-auto md:hidden")}
-            >
-              Odjava
-            </button>
-          )}
-
-          {/* Mobile hamburger — samo na javnim stranicama */}
-          {!compact && (
           <button
             type="button"
-            className="ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 md:hidden"
+            className="relative z-[110] ml-auto inline-flex h-10 w-10 shrink-0 touch-manipulation items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 md:hidden"
             aria-label={mobileOpen ? "Zatvori meni" : "Otvori meni"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-site-nav"
             onClick={() => setMobileOpen((v) => !v)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          )}
         </div>
       </div>
 
@@ -160,7 +165,8 @@ export function SiteHeaderNav({
           isLoggedIn={isLoggedIn}
           panelHref={panelHref}
           onLogout={onLogout}
-          onNavigate={() => setMobileOpen(false)}
+          onNavigate={closeMobile}
+          onClose={closeMobile}
         />
       )}
     </header>
