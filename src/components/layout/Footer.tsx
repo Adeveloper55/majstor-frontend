@@ -11,6 +11,12 @@ export function Footer() {
           <span className="font-semibold">{APP_NAME}</span>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+          <Link href="/uslovi-koriscenja" className="hover:text-primary-800">
+            Uslovi korišćenja
+          </Link>
+          <Link href="/pravila-poslovanja" className="hover:text-primary-800">
+            Pravila poslovanja
+          </Link>
           <Link href="/" className="hover:text-primary-800">
             Početna strana
           </Link>

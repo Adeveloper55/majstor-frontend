@@ -32,7 +32,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     pathname === "/magazin" ||
     pathname === "/pretraga" ||
     pathname.startsWith("/pretraga/") ||
-    pathname === "/registracija-preduzeca";
+    pathname === "/registracija-preduzeca" ||
+    pathname === "/uslovi-koriscenja" ||
+    pathname === "/pravila-poslovanja";
 
   return (
     <div className="flex min-h-screen flex-col">
