@@ -13,6 +13,7 @@ interface NadjiMajstoreMenuProps {
   onOpen: () => void;
   onClose: () => void;
   active: boolean;
+  inverted?: boolean;
 }
 
 const STEPS = [
@@ -21,7 +22,7 @@ const STEPS = [
   { n: 3, title: "Izaberite najboljeg" },
 ];
 
-export function NadjiMajstoreMenu({ open, onOpen, onClose, active }: NadjiMajstoreMenuProps) {
+export function NadjiMajstoreMenu({ open, onOpen, onClose, active, inverted = false }: NadjiMajstoreMenuProps) {
   const router = useRouter();
   const [selectedSlug, setSelectedSlug] = useState(SERVICE_CATEGORIES[0]?.slug ?? "");
 
@@ -43,7 +44,9 @@ export function NadjiMajstoreMenu({ open, onOpen, onClose, active }: NadjiMajsto
         onClick={() => (open ? onClose() : onOpen())}
         className={cn(
           "inline-flex cursor-pointer items-center gap-1 rounded-lg border-0 bg-transparent px-3 py-2 text-sm font-semibold transition-colors",
-          active || open ? "text-brand-600" : "text-slate-800 hover:text-brand-600"
+          active || open
+            ? inverted ? "text-cyan-300" : "text-brand-600"
+            : inverted ? "text-slate-200 hover:text-cyan-300" : "text-slate-800 hover:text-brand-600"
         )}
         aria-expanded={open}
       >

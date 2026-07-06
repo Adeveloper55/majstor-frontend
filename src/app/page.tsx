@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {
-  Wrench,
+  Search,
   Zap,
   Droplets,
   Paintbrush,
@@ -11,6 +11,9 @@ import {
   Coins,
   Users,
   ArrowRight,
+  Clock,
+  MessageCircle,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -41,6 +44,13 @@ const steps = [
   },
 ];
 
+const heroFeatures = [
+  { icon: ShieldCheck, title: "Provereni majstori", desc: "Svi majstori su verifikovani i ocenjeni od strane korisnika." },
+  { icon: Clock, title: "Brzo i lako", desc: "Postavite oglas za manje od 1 minuta." },
+  { icon: MessageCircle, title: "Direktna komunikacija", desc: "Dogovarajte detalje direktno sa majstorima." },
+  { icon: Lock, title: "Bezbedno i pouzdano", desc: "Vaša sigurnost i zadovoljstvo su naš prioritet." },
+];
+
 const features = [
   { icon: ShieldCheck, title: "Pouzdano", desc: "Recenzije i ocene nakon svakog završenog posla." },
   { icon: Coins, title: "Fer cena", desc: "Admin određuje koliko tokena košta pregled detalja posla." },
@@ -51,34 +61,48 @@ export default function HomePage() {
   return (
     <main>
       {/* Hero */}
-      <section className="hero-section">
-        <div className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggIGQ9Ik0zNiAzNGg2djZIMzZ6TTAgMGg2djZIMHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
-        <div className="page-container relative py-14 sm:py-20">
-          <div className="mx-auto max-w-4xl text-center">
+      <section className="hero-section -mt-16 pt-16">
+        <div className="page-container hero-inner">
+          <div className="flex flex-1 flex-col items-center justify-center py-10 text-center sm:py-14">
             <div className="hero-badge">
-              <Wrench className="h-4 w-4 shrink-0" aria-hidden />
+              <Search className="h-4 w-4 shrink-0 text-cyan-300" aria-hidden />
               {APP_NAME} — brzo, lako, pouzdano
             </div>
-            <h1 className="hero-heading mb-6">
-              Pronađite majstora za svaku popravku u kući
+            <h1 className="hero-heading mb-4 max-w-[920px]">
+              Pronađite majstora za svaku{" "}
+              <span className="hero-heading-accent">popravku u kući</span>
             </h1>
             <p className="hero-subtitle mb-8">
-              Pretražite uslugu ili objavite posao besplatno — majstori se prijave za par klikova.
+              Pretražite usluge ili objavite posao besplatno — majstori se prijave za par klikova.
             </p>
 
-            <div className="mb-10">
+            <div className="mb-8 w-full max-w-[600px]">
               <HeroSearch />
             </div>
 
-            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/register/client" className={cn(buttonVariants({ size: "lg" }), "btn-hero-primary w-full min-w-[200px] sm:w-auto")}>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+              <Link href="/register/client" className="btn-hero-link">
                 Tražim majstora
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/register/handyman" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "btn-hero-secondary w-full min-w-[200px] sm:w-auto")}>
+              <Link href="/register/handyman" className="btn-hero-primary">
                 Ja sam majstor
               </Link>
             </div>
+          </div>
+
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-3 pb-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+            {heroFeatures.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="hero-feature-card">
+                <div className="hero-feature-icon">
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
+                </div>
+                <div className="min-w-0 text-left">
+                  <h3 className="mb-0.5 text-sm font-bold text-white sm:text-base">{title}</h3>
+                  <p className="text-xs leading-snug text-slate-400 sm:text-sm sm:leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -49,6 +49,8 @@ const config: Config = {
       boxShadow: {
         card: "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08)",
         elevated: "0 4px 20px -2px rgb(30 64 175 / 0.12)",
+        "glow-blue": "0 0 20px rgba(59, 130, 246, 0.55), 0 0 40px rgba(37, 99, 235, 0.3)",
+        "glow-blue-sm": "0 0 12px rgba(59, 130, 246, 0.35)",
       },
     },
   },

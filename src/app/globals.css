@@ -10,6 +10,7 @@
   --primary-light: #2563eb;
   --muted: #64748b;
   --border: #e2e8f0;
+  --hero-cyan: #67e8f9;
 }
 
 @layer base {
@@ -67,23 +68,127 @@
     @apply text-slate-600;
   }
 
+  /* ─── Hero (mockup pozadina + glass UI) ─── */
   .hero-section {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
     @apply relative overflow-hidden text-white;
+    background-color: #020617;
+    background-image: url("/hero/hero-background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  @media (max-width: 767px) {
+    .hero-section {
+      background-image: url("/hero/hero-background-mobile.png");
+      background-position: center top;
+    }
+  }
+
+  .hero-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(2, 6, 23, 0.22) 0%, rgba(2, 6, 23, 0.06) 45%, rgba(2, 6, 23, 0.18) 100%),
+      radial-gradient(ellipse 60% 50% at 50% 45%, rgba(2, 6, 23, 0.1) 0%, transparent 72%);
+  }
+
+  .hero-inner {
+    @apply relative z-10 flex min-h-[calc(100vh-4rem)] flex-col;
   }
 
   .hero-heading {
-    @apply text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl;
+    @apply text-[2rem] font-bold leading-tight text-white sm:text-5xl lg:text-[3.25rem];
+  }
+
+  .hero-heading-accent {
+    color: var(--hero-cyan);
+    text-shadow: 0 0 28px rgba(103, 232, 249, 0.5);
   }
 
   .hero-subtitle {
-    @apply text-lg font-normal leading-relaxed text-blue-100 sm:text-xl;
+    @apply mx-auto max-w-2xl text-base font-normal leading-relaxed text-blue-100/90 sm:text-lg;
   }
 
   .hero-badge {
-    @apply mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white backdrop-blur-sm;
+    @apply mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm text-white backdrop-blur-md;
+    border-color: rgba(96, 165, 250, 0.45);
+    background: rgba(8, 28, 68, 0.5);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
   }
 
+  .hero-search-bar {
+    background: rgba(5, 18, 45, 0.62);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(96, 165, 250, 0.5);
+    box-shadow: 0 0 28px rgba(59, 130, 246, 0.22);
+    @apply transition-shadow duration-300;
+  }
+
+  .hero-search-bar:focus-within {
+    border-color: rgba(125, 211, 252, 0.65);
+    box-shadow: 0 0 36px rgba(59, 130, 246, 0.35);
+  }
+
+  .hero-search-bar-light {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 0.08);
+    @apply transition-shadow duration-300;
+  }
+
+  .hero-search-bar-light:focus-within {
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.12);
+  }
+
+  .hero-search-btn {
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    @apply shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-300 sm:px-6;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.45);
+  }
+
+  .hero-search-btn:hover {
+    background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+    box-shadow:
+      0 0 22px rgba(59, 130, 246, 0.7),
+      0 0 44px rgba(37, 99, 235, 0.35);
+  }
+
+  .hero-search-btn:active {
+    transform: scale(0.98);
+  }
+
+  .hero-feature-card {
+    background: rgba(6, 18, 42, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(96, 165, 250, 0.28);
+    box-shadow: 0 0 18px rgba(59, 130, 246, 0.1);
+    @apply flex items-center gap-3 rounded-xl p-4 sm:gap-4 sm:p-5;
+  }
+
+  .hero-feature-icon {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-cyan-200 sm:h-14 sm:w-14;
+    background: radial-gradient(circle at 35% 30%, rgba(103, 232, 249, 0.4), rgba(37, 99, 235, 0.4));
+    border: 1px solid rgba(96, 165, 250, 0.4);
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+  }
+
+  .btn-hero-link {
+    @apply inline-flex items-center justify-center gap-1.5 text-base font-semibold text-white/90 hover:text-white;
+  }
+
+  .hero-section .btn-hero-primary {
+    @apply inline-flex min-w-[190px] items-center justify-center rounded-full border-0 bg-white px-7 py-2.5 text-[15px] font-semibold text-slate-900 shadow-lg hover:bg-slate-100;
+  }
+
+  /* Globalni CTA dugmići (i hero i donji banner) */
   .btn-hero-primary {
     @apply w-full min-w-[200px] border-0 bg-white font-semibold text-primary-800 shadow-md hover:bg-blue-50 sm:w-auto;
   }

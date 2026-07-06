@@ -25,7 +25,7 @@ export default function PretragaPage() {
           Pronađite majstora za uslugu koja vam treba
         </p>
 
-        <HeroSearch initialQuery={q} />
+        <HeroSearch initialQuery={q} variant="light" />
 
         {q && (
           <div className="mt-10">

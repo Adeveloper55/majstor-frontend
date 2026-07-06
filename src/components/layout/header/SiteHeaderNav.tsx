@@ -67,15 +67,33 @@ export function SiteHeaderNav({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [mobileOpen, closeMobile]);
 
+  const onHero = pathname === "/" && !compact;
+
   return (
-    <header ref={headerRef} className="glass-nav sticky top-0 z-50 border-b border-slate-200 bg-white">
+    <header
+      ref={headerRef}
+      className={cn(
+        "sticky top-0 z-50 border-b",
+        onHero
+          ? "border-white/5 bg-[#01040f]/40 backdrop-blur-md"
+          : "glass-nav border-slate-200 bg-white"
+      )}
+    >
       <div className="page-container">
         <div className="flex h-16 items-center gap-4 md:gap-6">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2 text-lg font-bold text-primary-800 no-underline"
+            className={cn(
+              "flex shrink-0 items-center gap-2 text-lg font-bold no-underline",
+              onHero ? "text-white" : "text-primary-800"
+            )}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-800 text-white">
+            <span
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-lg text-white",
+                onHero ? "bg-blue-500 shadow-glow-blue-sm" : "bg-primary-800"
+              )}
+            >
               <Wrench className="h-5 w-5" />
             </span>
             <span className="hidden sm:inline">{APP_NAME}</span>
@@ -92,12 +110,14 @@ export function SiteHeaderNav({
               active={openMenu === "nadji"}
               onOpen={() => setOpenMenu("nadji")}
               onClose={closeMenus}
+              inverted={onHero}
             />
             <AlatiMenu
               open={openMenu === "alati"}
               active={openMenu === "alati"}
               onOpen={() => setOpenMenu("alati")}
               onClose={closeMenus}
+              inverted={onHero}
             />
             {!isLoggedIn && (
               <Link
@@ -118,20 +138,43 @@ export function SiteHeaderNav({
           {/* Desna strana — auth ili korisnički panel */}
           {!isLoggedIn ? (
             <div className="ml-auto hidden items-center gap-2 md:flex">
-              <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  onHero && "text-slate-200 hover:bg-white/10 hover:text-white"
+                )}
+              >
                 Prijavi se
               </Link>
-              <Link href="/register" className={buttonVariants({ size: "sm" })}>
+              <Link
+                href="/register"
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  onHero && "bg-blue-500 hover:bg-blue-600"
+                )}
+              >
                 Registruj se
               </Link>
             </div>
           ) : (
             <div className="ml-auto hidden items-center gap-2 md:flex">
-              <Link href={panelHref} className={buttonVariants({ variant: "ghost", size: "sm" })}>
+              <Link
+                href={panelHref}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  onHero && "text-slate-200 hover:bg-white/10 hover:text-white"
+                )}
+              >
                 Moj panel
               </Link>
               {userLabel && (
-                <span className="max-w-[100px] truncate text-sm text-slate-600 lg:max-w-[140px]">
+                <span
+                  className={cn(
+                    "max-w-[100px] truncate text-sm lg:max-w-[140px]",
+                    onHero ? "text-slate-300" : "text-slate-600"
+                  )}
+                >
                   {userLabel}
                 </span>
               )}
@@ -139,7 +182,10 @@ export function SiteHeaderNav({
                 <button
                   type="button"
                   onClick={onLogout}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    onHero && "border-white/25 text-slate-200 hover:bg-white/10 hover:text-white"
+                  )}
                 >
                   Odjava
                 </button>
@@ -149,7 +195,12 @@ export function SiteHeaderNav({
 
           <button
             type="button"
-            className="relative z-[110] ml-auto inline-flex h-10 w-10 shrink-0 touch-manipulation items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 md:hidden"
+            className={cn(
+              "relative z-[110] ml-auto inline-flex h-10 w-10 shrink-0 touch-manipulation items-center justify-center rounded-lg border md:hidden",
+              onHero
+                ? "border-white/20 bg-white/10 text-white hover:bg-white/15"
+                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            )}
             aria-label={mobileOpen ? "Zatvori meni" : "Otvori meni"}
             aria-expanded={mobileOpen}
             aria-controls="mobile-site-nav"
