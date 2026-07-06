@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { HeroSearch } from "@/components/home/HeroSearch";
+import { StatsCounter } from "@/components/home/StatsCounter";
 import { APP_NAME } from "@/constants";
 import { categoryRoutes } from "@/constants/categories";
 
@@ -90,8 +91,12 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+        </div>
 
-          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-3 pb-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+        <div className="page-container pb-8 pt-2">
+          <StatsCounter />
+
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
             {heroFeatures.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="hero-feature-card">
                 <div className="hero-feature-icon">

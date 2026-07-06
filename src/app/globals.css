@@ -196,4 +196,16 @@
   .btn-hero-secondary {
     @apply w-full min-w-[200px] border-2 border-white/60 bg-white/10 font-semibold text-white hover:bg-white/20 sm:w-auto;
   }
+
+  .stats-counter-inline {
+    @apply relative z-10 mx-auto mb-6 flex max-w-3xl flex-wrap items-center justify-center gap-x-10 gap-y-4 py-2 text-white sm:gap-x-16;
+  }
+
+  .stats-counter-value {
+    @apply text-4xl font-bold tabular-nums text-white sm:text-5xl;
+  }
+
+  .stats-counter-label {
+    @apply mt-1 text-base font-medium text-blue-100/90 sm:text-lg;
+  }
 }
