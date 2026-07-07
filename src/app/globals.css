@@ -73,14 +73,15 @@
     @apply relative overflow-hidden text-white;
     background-color: #020617;
     background-image: url("/hero/hero-background.png");
-    background-size: cover;
-    background-position: center;
+    background-size: contain;
+    background-position: center top;
     background-repeat: no-repeat;
   }
 
   @media (max-width: 767px) {
     .hero-section {
       background-image: url("/hero/hero-background-mobile.png");
+      background-size: contain;
       background-position: center top;
     }
   }
