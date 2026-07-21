@@ -64,7 +64,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="hero-section -mt-16 pt-16">
         <div className="page-container hero-inner">
-          <div className="flex flex-1 flex-col items-center justify-center py-10 text-center sm:py-14">
+          <div className="flex flex-col items-center py-10 text-center sm:py-12">
             <div className="hero-badge">
               <Search className="h-4 w-4 shrink-0 text-cyan-300" aria-hidden />
               {APP_NAME} — brzo, lako, pouzdano
@@ -90,24 +90,26 @@ export default function HomePage() {
                 Ja sam majstor
               </Link>
             </div>
+
+            <div className="mt-8 w-full">
+              <StatsCounter />
+            </div>
           </div>
-        </div>
 
-        <div className="page-container pb-8 pt-2">
-          <StatsCounter />
-
-          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-            {heroFeatures.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="hero-feature-card">
-                <div className="hero-feature-icon">
-                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
+          <div className="pb-8">
+            <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+              {heroFeatures.map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="hero-feature-card">
+                  <div className="hero-feature-icon">
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <h3 className="mb-0.5 text-sm font-bold text-white sm:text-base">{title}</h3>
+                    <p className="text-xs leading-snug text-slate-400 sm:text-sm sm:leading-relaxed">{desc}</p>
+                  </div>
                 </div>
-                <div className="min-w-0 text-left">
-                  <h3 className="mb-0.5 text-sm font-bold text-white sm:text-base">{title}</h3>
-                  <p className="text-xs leading-snug text-slate-400 sm:text-sm sm:leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -73,16 +73,18 @@
     @apply relative overflow-hidden text-white;
     background-color: #020617;
     background-image: url("/hero/hero-background.png");
-    background-size: contain;
-    background-position: center top;
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
+    min-height: calc(100vh - 0px);
   }
 
   @media (max-width: 767px) {
     .hero-section {
       background-image: url("/hero/hero-background-mobile.png");
-      background-size: contain;
+      background-size: cover;
       background-position: center top;
+      min-height: 100svh;
     }
   }
 
@@ -98,7 +100,7 @@
   }
 
   .hero-inner {
-    @apply relative z-10 flex min-h-[calc(100vh-4rem)] flex-col;
+    @apply relative z-10 flex flex-col;
   }
 
   .hero-heading {
