@@ -20,6 +20,8 @@ const publicPaths = [
   "/pretraga",
   "/nadji-majstore",
   "/registracija-preduzeca",
+  "/uslovi-koriscenja",
+  "/pravila-poslovanja",
 ];
 
 export function middleware(request: NextRequest) {
