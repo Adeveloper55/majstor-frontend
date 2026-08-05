@@ -18,6 +18,7 @@ export default function AdminInquiriesPage() {
     enabled: isPrimaryAdmin,
     queryFn: async () =>
       (await api.get<{ content: ServiceInquiry[] }>("/api/admin/inquiries?size=50")).data.content,
+    refetchOnMount: "always",
   });
 
   if (!isPrimaryAdmin) {

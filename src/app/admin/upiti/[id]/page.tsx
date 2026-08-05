@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { AdminLayout } from "@/components/layout/AdminLayout";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
@@ -13,9 +15,11 @@ import type { ServiceInquiry } from "@/types/serviceInquiry";
 
 export default function AdminInquiryDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const user = useAuthStore((s) => s.user) as AdminUser | null;
   const isPrimaryAdmin = Boolean(user?.primaryAdmin);
   const queryClient = useQueryClient();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { data: inquiry, isLoading } = useQuery({
     queryKey: ["admin-inquiry", id],
@@ -29,6 +33,21 @@ export default function AdminInquiryDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-inquiry", id] });
       queryClient.invalidateQueries({ queryKey: ["admin-inquiries"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+  });
+
+  const remove = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/api/admin/inquiries/${id}`);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin-inquiries"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin-stats"] }),
+      ]);
+      queryClient.removeQueries({ queryKey: ["admin-inquiry", id] });
+      router.push("/admin/upiti");
+      router.refresh();
     },
   });
 
@@ -99,12 +118,27 @@ export default function AdminInquiryDetailPage() {
           <p className="mt-2 whitespace-pre-wrap text-slate-900">{inquiry.detailedDescription}</p>
         </div>
 
-        {inquiry.status === "NEW" && (
-          <Button className="mt-6" onClick={() => markRead.mutate()} disabled={markRead.isPending}>
-            Označi kao pročitano
+        <div className="mt-6 flex flex-wrap gap-3">
+          {inquiry.status === "NEW" && (
+            <Button onClick={() => markRead.mutate()} disabled={markRead.isPending}>
+              Označi kao pročitano
+            </Button>
+          )}
+          <Button variant="destructive" onClick={() => setConfirmOpen(true)} disabled={remove.isPending}>
+            Obriši upit
           </Button>
-        )}
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Obriši upit?"
+        description="Upit će biti trajno obrisan. Ova akcija se ne može poništiti."
+        confirmLabel="Obriši"
+        loading={remove.isPending}
+        onConfirm={() => remove.mutate()}
+      />
     </AdminLayout>
   );
 }
