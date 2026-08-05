@@ -28,7 +28,10 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const CITY_OPTIONS = SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name }));
+const CITY_OPTIONS = [
+  { value: "", label: "Izaberite grad" },
+  ...SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name })),
+];
 
 export function JobForm() {
   const router = useRouter();
@@ -41,14 +44,19 @@ export function JobForm() {
 
   const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    // Beograd mora biti i u state-u, ne samo vizuelno prvi u <select>
-    defaultValues: { images: [], city: "Beograd" },
+    defaultValues: { images: [], city: "" },
   });
 
   const values = watch();
   const selectedCategory = categories?.find((c: { id: number }) => c.id === values.categoryId);
 
   const onSubmit = async (data: FormData) => {
+    const city = data.city?.trim() ?? "";
+    if (!city) {
+      setStep(3);
+      setError("Izaberite grad pre objavljivanja.");
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
@@ -56,7 +64,7 @@ export function JobForm() {
         categoryId: data.categoryId,
         title: data.title.trim(),
         description: data.description.trim(),
-        city: data.city.trim(),
+        city,
         images: data.images?.length ? data.images : undefined,
       };
       const res = await api.post("/api/jobs", payload);
@@ -164,13 +172,13 @@ export function JobForm() {
             </>
           )}
 
-          {step === 3 && (
+            {step === 3 && (
             <>
               <div>
                 <Label>Grad</Label>
                 <Select
                   options={CITY_OPTIONS}
-                  value={values.city}
+                  value={values.city ?? ""}
                   onValueChange={(v) => {
                     setError("");
                     setValue("city", v, { shouldValidate: true, shouldDirty: true });
@@ -203,7 +211,12 @@ export function JobForm() {
                 {stepBusy ? "Provera..." : "Dalje"}
               </Button>
             ) : (
-              <Button type="submit" disabled={submitting} className="ml-auto">
+              <Button
+                type="button"
+                disabled={submitting || !(values.city && values.city.trim())}
+                className="ml-auto"
+                onClick={() => void handleSubmit(onSubmit, onInvalid)()}
+              >
                 {submitting ? "Objavljivanje..." : "Objavi oglas"}
               </Button>
             )}
