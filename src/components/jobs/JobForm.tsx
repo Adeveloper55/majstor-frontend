@@ -170,8 +170,7 @@ export function JobForm() {
                 <Label>Grad</Label>
                 <Select
                   options={CITY_OPTIONS}
-                  value={values.city || "Beograd"}
-                  placeholder="Izaberite grad"
+                  value={values.city}
                   onValueChange={(v) => {
                     setError("");
                     setValue("city", v, { shouldValidate: true, shouldDirty: true });
@@ -185,7 +184,7 @@ export function JobForm() {
                 <p><strong>Naslov:</strong> {values.title || "—"}</p>
                 <p><strong>Grad:</strong> {values.city || "—"}</p>
                 <p className="mt-2 text-slate-600">
-                  Oglas ide adminu na pregled. Biće vidljiv majstorima i izvođačima tek kada admin odobri oglas i postavi cenu u tokenima.
+                  Oglas ide adminu na pregled. Biće vidljiv majstorima i izvođačima tek kada admin odobri oglas.
                 </p>
               </div>
             </>

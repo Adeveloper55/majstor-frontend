@@ -114,7 +114,7 @@ export default function JobDetailPage() {
               <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
                 <p className="font-semibold">Oglas još nije vidljiv majstorima i izvođačima</p>
                 <p className="mt-1">
-                  Admin mora da pregleda oglas, upiše koliko tokena košta pregled detalja i klikne „Dozvoli posao”.
+                  Admin mora da pregleda oglas i klikne „Dozvoli posao”.
                   Tek tada oglas postaje aktivan i vidljiv svim majstorima i izvođačima u platformi.
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function JobDetailPage() {
             {role === "ROLE_CLIENT" && job.status === "OPEN" && (
               <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4 text-sm text-green-900">
                 <p className="font-semibold">Oglas je aktivan</p>
-                <p className="mt-1">Majstori i izvođači vide oglas i mogu da pogledaju detalje (uz tokene). Ako im odgovara, sami zovu — vi ne birate ko zove.</p>
+                <p className="mt-1">Majstori i izvođači vide oglas i mogu da pogledaju detalje. Ako im odgovara, sami zovu — vi ne birate ko zove.</p>
               </div>
             )}
 

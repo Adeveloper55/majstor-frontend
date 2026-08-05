@@ -43,7 +43,7 @@ function ClientDashboard() {
             <CardHeader><CardTitle>Na čekanju od admina ({pendingJobs.length})</CardTitle></CardHeader>
             <CardContent>
               <p className="mb-4 text-sm text-slate-600">
-                Ovi oglasi nisu vidljivi majstorima i izvođačima dok admin ne odobri oglas i ne postavi cenu u tokenima.
+                Ovi oglasi nisu vidljivi majstorima i izvođačima dok admin ne odobri oglas.
               </p>
               <JobList jobs={pendingJobs.slice(0, 6)} hideTokenCost emptyMessage="" />
             </CardContent>
