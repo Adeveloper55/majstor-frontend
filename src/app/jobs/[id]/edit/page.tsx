@@ -15,7 +15,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_ICONS } from "@/constants";
 import { SERBIAN_CITIES } from "@/constants/serbianCities";
 
-const CITY_OPTIONS = SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name }));
+const CITY_OPTIONS = [
+  { value: "", label: "Izaberite grad" },
+  ...SERBIAN_CITIES.map((city) => ({ value: city.name, label: city.name })),
+];
 
 export default function EditJobPage() {
   const { id } = useParams<{ id: string }>();
