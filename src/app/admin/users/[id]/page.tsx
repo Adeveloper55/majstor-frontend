@@ -19,7 +19,7 @@ export default function AdminUserDetailPage() {
     queryFn: async () => (await api.get<User>(`/api/admin/users/${id}`)).data,
   });
 
-  const deactivate = async () => {
+  const deleteAccount = async () => {
     await api.delete(`/api/admin/users/${id}`);
     router.push("/admin/users");
   };
@@ -41,8 +41,15 @@ export default function AdminUserDetailPage() {
           <p><strong>Grad:</strong> {user.city || "—"}</p>
           <p><strong>Ocena:</strong> {user.averageRating} ({user.totalReviews} recenzija)</p>
         </div>
-        <Button variant="destructive" className="mt-6" onClick={() => setConfirmOpen(true)}>Deaktiviraj nalog</Button>
-        <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} title="Deaktiviraj klijenta?" description="Ova akcija se ne može poništiti." confirmLabel="Deaktiviraj" onConfirm={deactivate} />
+        <Button variant="destructive" className="mt-6" onClick={() => setConfirmOpen(true)}>Obriši nalog</Button>
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Obriši nalog klijenta?"
+          description="Nalog, svi oglasi, prijave i recenzije biće trajno obrisani iz baze. Korisnik će moći ponovo da se registruje istim emailom."
+          confirmLabel="Obriši trajno"
+          onConfirm={deleteAccount}
+        />
     </AdminLayout>
   );
 }

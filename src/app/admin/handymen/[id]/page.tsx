@@ -46,7 +46,7 @@ export default function AdminHandymanDetailPage() {
     }
   };
 
-  const deactivate = async () => {
+  const deleteAccount = async () => {
     await api.delete(`/api/admin/handymen/${id}`);
     router.push("/admin/handymen");
   };
@@ -72,14 +72,14 @@ export default function AdminHandymanDetailPage() {
           {adjustMessage && <p className="text-sm text-amber-700">{adjustMessage}</p>}
           {adjustError && <p className="text-sm text-red-600">{adjustError}</p>}
         </div>
-        <Button variant="destructive" onClick={() => setConfirmOpen(true)}>Deaktiviraj majstora</Button>
+        <Button variant="destructive" onClick={() => setConfirmOpen(true)}>Obriši nalog</Button>
         <ConfirmDialog
           open={confirmOpen}
           onOpenChange={setConfirmOpen}
-          title="Deaktiviraj majstora?"
-          description="Majstor više neće moći da se prijavi na platformu."
-          confirmLabel="Deaktiviraj"
-          onConfirm={deactivate}
+          title="Obriši nalog majstora / preduzeća?"
+          description="Nalog, prijave na poslove, tokeni, recenzije i povezana registracija preduzeća biće trajno obrisani. Email, telefon i PIB će biti slobodni za novu registraciju."
+          confirmLabel="Obriši trajno"
+          onConfirm={deleteAccount}
         />
     </AdminLayout>
   );
