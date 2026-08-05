@@ -13,6 +13,7 @@ export default function AdminPendingJobsPage() {
     queryKey: ["admin-pending-jobs"],
     queryFn: async () =>
       (await api.get<{ content: JobListing[] }>("/api/admin/jobs?status=PENDING_APPROVAL&size=50")).data.content,
+    refetchOnMount: "always",
   });
 
   return (

@@ -12,6 +12,7 @@ export default function AdminJobsPage() {
   const { data } = useQuery({
     queryKey: ["admin-jobs"],
     queryFn: async () => (await api.get<{ content: JobListing[] }>("/api/admin/jobs?size=50")).data.content,
+    refetchOnMount: "always",
   });
 
   return (

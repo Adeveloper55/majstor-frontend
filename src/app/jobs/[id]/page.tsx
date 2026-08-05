@@ -49,12 +49,24 @@ export default function JobDetailPage() {
 
   const handleComplete = async () => {
     await api.post(`/api/jobs/${id}/complete`);
-    refetch();
+    await Promise.all([
+      refetch(),
+      queryClient.invalidateQueries({ queryKey: ["jobs"] }),
+      queryClient.invalidateQueries({ queryKey: ["jobs", "my"] }),
+    ]);
+    router.refresh();
   };
 
   const handleCancel = async () => {
     await api.delete(`/api/jobs/${id}`);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["jobs"] }),
+      queryClient.invalidateQueries({ queryKey: ["jobs", "my"] }),
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+    ]);
+    queryClient.removeQueries({ queryKey: ["job", id] });
     router.push("/jobs");
+    router.refresh();
   };
 
   if (!token || isLoading) return <p className="p-8">Učitavanje...</p>;

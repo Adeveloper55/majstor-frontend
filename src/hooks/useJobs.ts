@@ -26,6 +26,7 @@ export function useJobs(filters?: JobFiltersState, mode: "browse" | "my" = "brow
   return useQuery({
     queryKey: ["jobs", mode, role, filters, token],
     enabled: !!token && (myMode || handymanBrowse || (!myMode && role !== "ROLE_HANDYMAN")),
+    refetchOnMount: "always",
     queryFn: async () => {
       if (myMode) {
         const { data } = await api.get<{ content: JobListing[] }>("/api/jobs/my?size=50");

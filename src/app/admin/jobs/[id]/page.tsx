@@ -43,7 +43,15 @@ export default function AdminJobDetailPage() {
 
   const remove = async () => {
     await api.delete(`/api/admin/jobs/${id}`);
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["admin-jobs"] }),
+      qc.invalidateQueries({ queryKey: ["admin-pending-jobs"] }),
+      qc.invalidateQueries({ queryKey: ["admin-stats"] }),
+      qc.invalidateQueries({ queryKey: ["jobs"] }),
+    ]);
+    qc.removeQueries({ queryKey: ["admin-job", id] });
     router.push("/admin/jobs");
+    router.refresh();
   };
 
   const approveLegacyJob = async () => {
@@ -56,10 +64,15 @@ export default function AdminJobDetailPage() {
     setApproveError("");
     try {
       await api.post(`/api/admin/jobs/${id}/approve`, { tokenCost: cost });
-      await refetch();
-      qc.invalidateQueries({ queryKey: ["admin-stats"] });
-      qc.invalidateQueries({ queryKey: ["admin-jobs"] });
-      qc.invalidateQueries({ queryKey: ["admin-pending-jobs"] });
+      await Promise.all([
+        refetch(),
+        qc.invalidateQueries({ queryKey: ["admin-stats"] }),
+        qc.invalidateQueries({ queryKey: ["admin-jobs"] }),
+        qc.invalidateQueries({ queryKey: ["admin-pending-jobs"] }),
+        qc.invalidateQueries({ queryKey: ["jobs"] }),
+        qc.invalidateQueries({ queryKey: ["admin-job", id] }),
+      ]);
+      router.refresh();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setApproveError(msg || "Greška pri odobravanju.");

@@ -13,6 +13,7 @@ export default function AdminUsersPage() {
   const { data } = useQuery({
     queryKey: ["admin-users", search],
     queryFn: async () => (await api.get<{ content: User[] }>(`/api/admin/users?size=50&search=${encodeURIComponent(search)}`)).data.content,
+    refetchOnMount: "always",
   });
 
   return (

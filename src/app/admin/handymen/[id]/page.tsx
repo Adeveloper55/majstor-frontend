@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -14,6 +14,7 @@ import type { Handyman } from "@/types";
 export default function AdminHandymanDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [amount, setAmount] = useState(0);
   const [description, setDescription] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -48,7 +49,15 @@ export default function AdminHandymanDetailPage() {
 
   const deleteAccount = async () => {
     await api.delete(`/api/admin/handymen/${id}`);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin-handymen"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-token-requests"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-company-registrations"] }),
+    ]);
+    queryClient.removeQueries({ queryKey: ["admin-handyman", id] });
     router.push("/admin/handymen");
+    router.refresh();
   };
 
   return (

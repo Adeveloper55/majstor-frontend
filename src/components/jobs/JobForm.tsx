@@ -68,8 +68,11 @@ export function JobForm() {
         images: data.images?.length ? data.images : undefined,
       };
       const res = await api.post("/api/jobs", payload);
+      await queryClient.invalidateQueries({ queryKey: ["jobs"] });
       await queryClient.invalidateQueries({ queryKey: ["jobs", "my"] });
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       router.push(`/jobs/${res.data.id}`);
+      router.refresh();
     } catch (err: unknown) {
       const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
       if (axiosErr.response?.status === 403) {

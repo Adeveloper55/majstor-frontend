@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -12,6 +12,7 @@ import type { User } from "@/types";
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { data: user } = useQuery({
@@ -21,7 +22,16 @@ export default function AdminUserDetailPage() {
 
   const deleteAccount = async () => {
     await api.delete(`/api/admin/users/${id}`);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-jobs"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-pending-jobs"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] }),
+      queryClient.invalidateQueries({ queryKey: ["jobs"] }),
+    ]);
+    queryClient.removeQueries({ queryKey: ["admin-user", id] });
     router.push("/admin/users");
+    router.refresh();
   };
 
   if (!user) {

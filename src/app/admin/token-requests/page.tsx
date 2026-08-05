@@ -43,12 +43,12 @@ export default function AdminTokenRequestsPage() {
 
   const approve = async (id: string) => {
     await api.post(`/api/admin/token-requests/${id}/approve`);
-    refetch();
+    await refetch();
   };
 
   const reject = async (id: string) => {
     await api.post(`/api/admin/token-requests/${id}/reject`, { adminNote: rejectNote[id] || "" });
-    refetch();
+    await refetch();
   };
 
   return (

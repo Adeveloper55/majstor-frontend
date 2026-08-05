@@ -13,6 +13,7 @@ export default function AdminHandymenPage() {
   const { data } = useQuery({
     queryKey: ["admin-handymen", search],
     queryFn: async () => (await api.get<{ content: Handyman[] }>(`/api/admin/handymen?size=50&search=${encodeURIComponent(search)}`)).data.content,
+    refetchOnMount: "always",
   });
 
   return (
