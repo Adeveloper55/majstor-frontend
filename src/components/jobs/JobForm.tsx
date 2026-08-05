@@ -41,7 +41,8 @@ export function JobForm() {
 
   const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { images: [], city: "" },
+    // Beograd mora biti i u state-u, ne samo vizuelno prvi u <select>
+    defaultValues: { images: [], city: "Beograd" },
   });
 
   const values = watch();
@@ -169,7 +170,7 @@ export function JobForm() {
                 <Label>Grad</Label>
                 <Select
                   options={CITY_OPTIONS}
-                  value={values.city || ""}
+                  value={values.city || "Beograd"}
                   placeholder="Izaberite grad"
                   onValueChange={(v) => {
                     setError("");

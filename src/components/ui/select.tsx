@@ -9,8 +9,9 @@ export interface SelectOption {
   label: string;
 }
 
-interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange"> {
+interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "value"> {
   options: readonly SelectOption[];
+  value?: string;
   onValueChange?: (value: string) => void;
   /** Shown when value is empty so the browser does not fake-select the first option. */
   placeholder?: string;
@@ -18,28 +19,27 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, options, onValueChange, value, placeholder, ...props }, ref) => {
+    const resolvedValue = value ?? "";
     const hasEmptyOption = options.some((opt) => opt.value === "");
-    const showPlaceholder = Boolean(placeholder) && !hasEmptyOption;
+    const optionsWithPlaceholder =
+      placeholder && !hasEmptyOption
+        ? [{ value: "", label: placeholder }, ...options]
+        : [...options];
 
     return (
       <div className="relative">
         <select
           ref={ref}
-          value={value ?? ""}
+          {...props}
+          value={resolvedValue}
           onChange={(e) => onValueChange?.(e.target.value)}
           className={cn(
             "flex h-11 w-full appearance-none rounded-lg border-2 border-slate-300 bg-white px-4 py-2 pr-10 text-base text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
-          {...props}
         >
-          {showPlaceholder && (
-            <option value="" disabled={props.required}>
-              {placeholder}
-            </option>
-          )}
-          {options.map((opt) => (
-            <option key={opt.value === "" ? "__empty" : opt.value} value={opt.value}>
+          {optionsWithPlaceholder.map((opt) => (
+            <option key={opt.value === "" ? "__placeholder" : opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
