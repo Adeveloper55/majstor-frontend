@@ -109,6 +109,7 @@ export default function EditJobPage() {
                 <Select
                   options={CITY_OPTIONS}
                   value={form.city}
+                  placeholder="Izaberite grad"
                   onValueChange={(v) => setForm({ ...form, city: v })}
                 />
               </div>

@@ -12,29 +12,41 @@ export interface SelectOption {
 interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange"> {
   options: readonly SelectOption[];
   onValueChange?: (value: string) => void;
+  /** Shown when value is empty so the browser does not fake-select the first option. */
+  placeholder?: string;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, options, onValueChange, value, ...props }, ref) => (
-    <div className="relative">
-      <select
-        ref={ref}
-        value={value}
-        onChange={(e) => onValueChange?.(e.target.value)}
-        className={cn(
-          "flex h-11 w-full appearance-none rounded-lg border-2 border-slate-300 bg-white px-4 py-2 pr-10 text-base text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className
-        )}
-        {...props}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-    </div>
-  )
+  ({ className, options, onValueChange, value, placeholder, ...props }, ref) => {
+    const hasEmptyOption = options.some((opt) => opt.value === "");
+    const showPlaceholder = Boolean(placeholder) && !hasEmptyOption;
+
+    return (
+      <div className="relative">
+        <select
+          ref={ref}
+          value={value ?? ""}
+          onChange={(e) => onValueChange?.(e.target.value)}
+          className={cn(
+            "flex h-11 w-full appearance-none rounded-lg border-2 border-slate-300 bg-white px-4 py-2 pr-10 text-base text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            className
+          )}
+          {...props}
+        >
+          {showPlaceholder && (
+            <option value="" disabled={props.required}>
+              {placeholder}
+            </option>
+          )}
+          {options.map((opt) => (
+            <option key={opt.value === "" ? "__empty" : opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+      </div>
+    );
+  }
 );
 Select.displayName = "Select";

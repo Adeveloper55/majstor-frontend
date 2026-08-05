@@ -170,7 +170,11 @@ export function JobForm() {
                 <Select
                   options={CITY_OPTIONS}
                   value={values.city || ""}
-                  onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
+                  placeholder="Izaberite grad"
+                  onValueChange={(v) => {
+                    setError("");
+                    setValue("city", v, { shouldValidate: true, shouldDirty: true });
+                  }}
                 />
                 {errors.city && <p className="text-sm text-red-600">{errors.city.message}</p>}
               </div>
